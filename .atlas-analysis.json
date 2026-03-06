@@ -1,0 +1,77 @@
+{
+  "projectType": "frontend",
+  "projectName": "Portfolio Moretto",
+  "projectDescription": "A modern, bilingual personal portfolio website showcasing Federico Moretto's software development work and professional experience.",
+  "theme": "willow",
+  "primaryColor": "#ec2323",
+  "lightColor": null,
+  "darkColor": null,
+  "navigation": {
+    "groups": [
+      {
+        "group": "Get Started",
+        "pages": [
+          "introduction",
+          "quickstart"
+        ]
+      },
+      {
+        "group": "Architecture",
+        "pages": [
+          "architecture/overview",
+          "architecture/components",
+          "architecture/internationalization"
+        ]
+      },
+      {
+        "group": "Components",
+        "pages": [
+          "components/header",
+          "components/hero",
+          "components/about",
+          "components/skills",
+          "components/experience",
+          "components/projects",
+          "components/contact",
+          "components/footer"
+        ]
+      },
+      {
+        "group": "Development",
+        "pages": [
+          "development/setup",
+          "development/styling",
+          "development/firebase"
+        ]
+      },
+      {
+        "group": "Customization",
+        "pages": [
+          "customization/content",
+          "customization/translations",
+          "customization/styling"
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Bilingual support (Spanish/English) with react-i18next",
+    "Responsive design with Tailwind CSS",
+    "Firebase integration for dynamic project data",
+    "Modern React component architecture",
+    "SEO-optimized structure",
+    "Smooth scrolling navigation"
+  ],
+  "publicApiSurface": [
+    "App - Main application component",
+    "Header - Navigation and language toggle",
+    "Hero - Landing section with introduction",
+    "About - Personal background and highlights",
+    "Skills - Technology stack showcase",
+    "Works - Professional experience timeline",
+    "ProjectsView - Dynamic project gallery",
+    "Contact - Contact information and CTAs",
+    "Footer - Site footer with credits",
+    "i18n - Internationalization configuration"
+  ]
+}
