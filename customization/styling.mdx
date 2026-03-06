@@ -1,0 +1,644 @@
+---
+title: Styling & Design
+description: Customize the visual appearance of Portfolio Moretto using Tailwind CSS, custom colors, typography, and component-specific styles.
+icon: 'palette'
+---
+
+## Overview
+
+Portfolio Moretto uses **Tailwind CSS** as its primary styling framework, combined with custom SCSS for legacy styles. The design system emphasizes a dark, modern aesthetic with glassmorphism effects and smooth transitions.
+
+## Styling Architecture
+
+The project uses multiple styling approaches:
+
+```bash
+source/src/
+├── index.css                      # Main Tailwind imports and base styles
+├── styles/
+│   ├── _variables.scss            # SCSS color and font variables
+│   └── style.scss                 # Legacy SCSS styles
+└── components/                     # Component files with inline Tailwind classes
+```
+
+<Note>
+  The portfolio is transitioning from SCSS to Tailwind CSS. New components use Tailwind exclusively, while older styles remain in SCSS files.
+</Note>
+
+## Tailwind Configuration
+
+The Tailwind configuration is minimal, using mostly default values:
+
+```javascript tailwind.config.js
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+```
+
+### Customizing Tailwind
+
+To add custom colors, fonts, or other design tokens, extend the theme:
+
+```javascript tailwind.config.js
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        brand: {
+          50: '#f0f9ff',
+          100: '#e0f2fe',
+          500: '#0ea5e9',
+          900: '#0c4a6e',
+        },
+        accent: {
+          emerald: '#10b981',
+          sky: '#0ea5e9',
+          violet: '#8b5cf6',
+        }
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        mono: ['Fira Code', 'monospace'],
+      },
+      borderRadius: {
+        '4xl': '2rem',
+      }
+    },
+  },
+  plugins: [],
+}
+```
+
+## Color Scheme
+
+The portfolio uses Tailwind's slate color palette with accent colors for highlights.
+
+### Primary Colors
+
+<AccordionGroup>
+  <Accordion title="Background Colors">
+    - `bg-slate-950` - Main background
+    - `bg-slate-900/50` - Card backgrounds with opacity
+    - `bg-slate-900/70` - Secondary card backgrounds
+    - `bg-slate-800` - Borders and dividers
+  </Accordion>
+  
+  <Accordion title="Text Colors">
+    - `text-white` - Primary headings
+    - `text-slate-200` - Body text
+    - `text-slate-300` - Secondary text
+    - `text-slate-400` - Tertiary/muted text
+  </Accordion>
+  
+  <Accordion title="Accent Colors">
+    - `text-emerald-*` / `bg-emerald-*` - Primary actions, success states
+    - `text-sky-*` / `bg-sky-*` - Skills, interactive elements
+    - `text-violet-*` / `bg-violet-*` - Technology tags
+  </Accordion>
+</AccordionGroup>
+
+### Color Usage Examples
+
+Here's how colors are applied in the Hero component:
+
+```jsx Hero.jsx
+<section className="scroll-mt-32 px-6">
+  <div className="border border-slate-800 bg-slate-900/50 backdrop-blur">
+    {/* Status badge with emerald accent */}
+    <span className="border-slate-700 bg-slate-900/70 text-sky-300">
+      <span className="bg-emerald-400" />
+      {t("hero.tagline")}
+    </span>
+    
+    {/* White heading */}
+    <h1 className="text-white">
+      {t("hero.title")}
+    </h1>
+    
+    {/* Slate-200 body text */}
+    <p className="text-slate-200">
+      {t("hero.description")}
+    </p>
+    
+    {/* Secondary text in slate-400 */}
+    <p className="text-slate-400">
+      {t("hero.secondary")}
+    </p>
+    
+    {/* Emerald CTA button */}
+    <a className="border-emerald-500/70 bg-emerald-500/10 text-emerald-200 hover:bg-emerald-400/20">
+      {t("hero.ctaContact")}
+    </a>
+  </div>
+</section>
+```
+
+### Updating the Color Scheme
+
+To change the overall color scheme:
+
+<Steps>
+  <Step title="Choose your base colors">
+    Select a Tailwind color palette (zinc, gray, neutral, etc.) to replace slate.
+  </Step>
+  
+  <Step title="Update index.css">
+    Change the base background color:
+    
+    ```css index.css
+    body {
+      @apply bg-zinc-950 text-zinc-100 antialiased;
+    }
+    ```
+  </Step>
+  
+  <Step title="Search and replace">
+    Use your editor to find all instances of `slate-` and replace with your chosen color:
+    - `slate-950` → `zinc-950`
+    - `slate-900` → `zinc-900`
+    - etc.
+  </Step>
+  
+  <Step title="Update accent colors">
+    Replace emerald, sky, and violet with your brand colors throughout the components.
+  </Step>
+</Steps>
+
+## Typography
+
+The portfolio uses custom font imports and Tailwind typography utilities.
+
+### Font Configuration
+
+Base font setup in `index.css`:
+
+```css index.css
+@layer base {
+  body {
+    @apply bg-slate-950 text-slate-100 antialiased;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+}
+```
+
+The SCSS variables file also defines fonts (for legacy components):
+
+```scss _variables.scss
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap');
+
+$fuente: 'Fira Code', monospace;
+$fuenteEmoji: "Noto Color Emoji", sans-serif;
+```
+
+### Typography Scale
+
+Common text sizes used throughout:
+
+```jsx
+{/* Headings */}
+<h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-white">
+<h2 className="text-3xl sm:text-4xl font-semibold text-white">
+<h3 className="text-xl font-semibold text-white">
+
+{/* Body text */}
+<p className="text-lg leading-relaxed text-slate-200">
+<p className="text-base leading-relaxed text-slate-200">
+<p className="text-sm text-slate-300">
+
+{/* Small text */}
+<span className="text-xs uppercase tracking-[0.3em] text-slate-400">
+```
+
+### Changing Fonts
+
+<Steps>
+  <Step title="Add font imports">
+    Update `index.css` with your Google Fonts URL or local font files:
+    
+    ```css
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+    ```
+  </Step>
+  
+  <Step title="Update Tailwind config">
+    Define your custom fonts:
+    
+    ```javascript tailwind.config.js
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Space Grotesk', 'system-ui', 'sans-serif'],
+          display: ['Space Grotesk', 'system-ui', 'sans-serif'],
+        },
+      },
+    }
+    ```
+  </Step>
+  
+  <Step title="Apply in components">
+    Use the custom font classes:
+    
+    ```jsx
+    <h1 className="font-display text-6xl font-bold">
+    ```
+  </Step>
+</Steps>
+
+## Responsive Breakpoints
+
+Tailwind's default breakpoints are used throughout:
+
+```javascript
+sm:  640px  // Small devices (tablets)
+md:  768px  // Medium devices
+lg:  1024px // Large devices (desktops)
+xl:  1280px // Extra large devices
+2xl: 1536px // 2X large devices
+```
+
+### Responsive Patterns
+
+Examples from the codebase:
+
+```jsx About.jsx
+{/* Grid changes from 1 to 2 columns at large screens */}
+<div className="grid gap-10 lg:grid-cols-[3fr,2fr]">
+  {/* Content */}
+</div>
+```
+
+```jsx Skills.jsx
+{/* Grid changes from 1 to 3 columns */}
+<div className="grid gap-6 md:grid-cols-3">
+  {/* Skills groups */}
+</div>
+```
+
+```jsx Hero.jsx
+{/* Text size increases at larger screens */}
+<h1 className="text-4xl font-semibold sm:text-5xl lg:text-6xl">
+  {t("hero.title")}
+</h1>
+```
+
+```jsx Header.jsx
+{/* Mobile menu hidden on desktop */}
+<button className="flex sm:hidden">
+  {/* Hamburger icon */}
+</button>
+
+{/* Desktop nav always visible */}
+<nav className="hidden sm:flex">
+  {/* Navigation links */}
+</nav>
+```
+
+## Component-Specific Styling
+
+Each component uses consistent styling patterns.
+
+### Card Pattern
+
+Most sections use a glassmorphism card effect:
+
+```jsx
+<div className="rounded-3xl border border-slate-800 bg-slate-900/50 px-8 py-12 shadow-xl shadow-slate-950/40 backdrop-blur">
+  {/* Content */}
+</div>
+```
+
+Breakdown:
+- `rounded-3xl` - Large border radius
+- `border border-slate-800` - Subtle border
+- `bg-slate-900/50` - Semi-transparent background
+- `shadow-xl shadow-slate-950/40` - Drop shadow
+- `backdrop-blur` - Glassmorphism effect
+
+### Button Patterns
+
+<CodeGroup>
+```jsx Primary Button (Emerald)
+<a className="inline-flex items-center justify-center gap-2 rounded-full border border-emerald-500/70 bg-emerald-500/10 px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-emerald-200 transition hover:border-emerald-400 hover:bg-emerald-400/20">
+  <i className="bi bi-send-fill" />
+  {t("hero.ctaContact")}
+</a>
+```
+
+```jsx Secondary Button (Slate)
+<a className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-700 bg-slate-900/70 px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-slate-200 transition hover:border-slate-500 hover:bg-slate-800/80">
+  <i className="bi bi-grid-fill" />
+  {t("hero.ctaProjects")}
+</a>
+```
+</CodeGroup>
+
+### Badge/Tag Pattern
+
+Used for skills and technologies:
+
+```jsx Skills.jsx
+{/* Skill tag */}
+<li className="rounded-full border border-sky-500/60 bg-sky-500/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.25em] text-sky-200">
+  {item}
+</li>
+```
+
+```jsx Works.jsx
+{/* Technology tag */}
+<li className="rounded-full border border-violet-500/60 bg-violet-500/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.25em] text-violet-200">
+  {tech}
+</li>
+```
+
+### Highlight/List Item Pattern
+
+```jsx About.jsx
+<li className="flex items-start gap-3 rounded-2xl border border-slate-800 bg-slate-900/70 px-4 py-3 text-sm leading-relaxed text-slate-200">
+  <span className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300">
+    <i className="bi bi-check2" />
+  </span>
+  <span>{item}</span>
+</li>
+```
+
+## Effects & Animations
+
+### Backdrop Blur (Glassmorphism)
+
+Used throughout for modern glass effect:
+
+```jsx
+<div className="bg-slate-900/50 backdrop-blur">
+  {/* Content */}
+</div>
+```
+
+### Gradient Backgrounds
+
+```jsx About.jsx
+<div className="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900/80 via-slate-900/40 to-slate-900/80">
+  {area}
+</div>
+```
+
+### Hover Transitions
+
+All interactive elements use smooth transitions:
+
+```jsx
+<a className="transition hover:border-slate-500 hover:bg-slate-800/80">
+  {/* Content */}
+</a>
+
+<a className="transition duration-200 hover:scale-105">
+  {/* Content */}
+</a>
+```
+
+### Glow Effects
+
+About section uses positioned blur elements for ambient glow:
+
+```jsx About.jsx
+<div className="absolute -top-10 h-32 w-32 rounded-full bg-emerald-500/20 blur-3xl" />
+<div className="absolute -bottom-12 right-0 h-32 w-32 rounded-full bg-sky-500/10 blur-3xl" />
+```
+
+## Custom CSS (Legacy SCSS)
+
+Some older styles remain in SCSS files:
+
+### SCSS Variables
+
+```scss _variables.scss
+$colorPrimario: #FF0000;
+$colorSecundario: #4682B4;
+$colorNegro: #0b1622;
+$colorGris: #C0C0C0;
+$colorBlanco: #FFFFFF;
+```
+
+### Legacy Styles
+
+The `style.scss` file contains older component styles:
+
+```scss style.scss
+.hover-underline-animation {
+  display: inline-block;
+  position: relative;
+  color: $colorBlanco;
+}
+
+.hover-underline-animation::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  transform: scaleX(0);
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background-color: $colorPrimario;
+  transform-origin: bottom right;
+  transition: transform 0.25s ease-out;
+}
+```
+
+<Warning>
+  Avoid modifying SCSS files for new features. Use Tailwind classes instead for consistency.
+</Warning>
+
+## Icons
+
+The portfolio uses **Bootstrap Icons** for all iconography:
+
+```jsx
+<i className="bi bi-send-fill" />
+<i className="bi bi-grid-fill" />
+<i className="bi bi-check2" />
+<i className="bi bi-arrow-right" />
+<i className="bi bi-envelope-paper-heart" />
+<i className="bi bi-file-earmark-arrow-down" />
+<i className="bi bi-laptop" />
+<i className="bi bi-github" />
+```
+
+Bootstrap Icons are imported in `_variables.scss`:
+
+```scss
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css");
+```
+
+### Using Different Icons
+
+To switch to a different icon library:
+
+<Steps>
+  <Step title="Remove Bootstrap Icons">
+    Delete the import from `_variables.scss`.
+  </Step>
+  
+  <Step title="Install your preferred icon library">
+    For example, Heroicons:
+    ```bash
+    npm install @heroicons/react
+    ```
+  </Step>
+  
+  <Step title="Update components">
+    Replace icon usage:
+    ```jsx
+    import { EnvelopeIcon } from '@heroicons/react/24/outline'
+    
+    <EnvelopeIcon className="h-5 w-5" />
+    ```
+  </Step>
+</Steps>
+
+## Dark Mode Considerations
+
+The portfolio is designed exclusively for dark mode:
+
+```css index.css
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-slate-950 text-slate-100 antialiased;
+  }
+}
+```
+
+To add light mode support, you would need to:
+1. Add `darkMode: 'class'` to `tailwind.config.js`
+2. Create light mode color variants
+3. Implement a theme toggle
+4. Update all components with dark mode classes
+
+## Styling Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Use Tailwind utilities" icon="wind">
+    Prefer Tailwind classes over custom CSS for maintainability and consistency.
+  </Card>
+  
+  <Card title="Maintain spacing rhythm" icon="ruler">
+    Use consistent spacing values from Tailwind's spacing scale (px-6, py-12, gap-4, etc.).
+  </Card>
+  
+  <Card title="Keep opacity consistent" icon="droplet">
+    Use standard opacity values: /10, /20, /40, /50, /60, /70, /80, /90.
+  </Card>
+  
+  <Card title="Reuse component patterns" icon="copy">
+    When creating new sections, copy styling patterns from existing components.
+  </Card>
+  
+  <Card title="Test responsiveness" icon="mobile">
+    Always test layouts at different screen sizes (mobile, tablet, desktop).
+  </Card>
+  
+  <Card title="Use semantic class names" icon="tag">
+    When extracting components, use descriptive names that reflect purpose, not appearance.
+  </Card>
+</CardGroup>
+
+## Common Customizations
+
+### Changing Border Radius
+
+The portfolio uses large rounded corners. To make them more subtle:
+
+```javascript tailwind.config.js
+theme: {
+  extend: {
+    borderRadius: {
+      'xl': '0.75rem',  // Default is 0.75rem
+      '2xl': '1rem',    // Default is 1rem  
+      '3xl': '1.5rem',  // Default is 1.5rem
+    },
+  },
+}
+```
+
+### Adjusting Blur Effects
+
+Reduce or increase backdrop blur intensity:
+
+```jsx
+{/* Less blur */}
+<div className="backdrop-blur-sm">
+
+{/* Default */}
+<div className="backdrop-blur">
+
+{/* More blur */}
+<div className="backdrop-blur-lg">
+```
+
+### Customizing Shadows
+
+Adjust shadow intensity:
+
+```jsx
+{/* Subtle */}
+<div className="shadow-lg shadow-slate-950/20">
+
+{/* Default */}
+<div className="shadow-xl shadow-slate-950/40">
+
+{/* Dramatic */}
+<div className="shadow-2xl shadow-slate-950/60">
+```
+
+## Performance Considerations
+
+<Tip>
+  Tailwind automatically purges unused styles in production, so don't worry about file size when using many utility classes.
+</Tip>
+
+### Optimizing for Production
+
+1. **Purging** - Tailwind's default configuration already purges unused styles
+2. **Minification** - Build process automatically minifies CSS
+3. **Avoid arbitrary values** - Prefer Tailwind's built-in values over arbitrary ones like `w-[347px]`
+
+## Resources
+
+<CardGroup cols={2}>
+  <Card title="Tailwind CSS Docs" icon="wind" href="https://tailwindcss.com/docs">
+    Official Tailwind CSS documentation
+  </Card>
+  
+  <Card title="Tailwind Color Reference" icon="palette" href="https://tailwindcss.com/docs/customizing-colors">
+    Complete color palette reference
+  </Card>
+  
+  <Card title="Bootstrap Icons" icon="icons" href="https://icons.getbootstrap.com/">
+    Search and browse available icons
+  </Card>
+  
+  <Card title="Tailwind Play" icon="code" href="https://play.tailwindcss.com/">
+    Online playground to test Tailwind classes
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<Card title="Content Customization" icon="file-text" href="/customization/content">
+  Learn how to update your personal information and portfolio content
+</Card>

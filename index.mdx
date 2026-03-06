@@ -1,97 +1,131 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "Portfolio Moretto Documentation"
+description: "Modern, bilingual personal portfolio built with React and Firebase"
 ---
 
-## Setting up
+<div style={{
+  background: 'linear-gradient(135deg, #0B111D 0%, #1a2332 100%)',
+  borderRadius: '16px',
+  padding: '48px 32px',
+  marginBottom: '32px',
+  border: '1px solid rgba(255, 255, 255, 0.1)',
+  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5)'
+}}>
+  <h1 style={{
+    fontSize: '40px',
+    fontWeight: 700,
+    color: '#E1E6F0',
+    marginBottom: '16px',
+    fontFamily: 'Inter'
+  }}>
+    Portfolio Moretto
+  </h1>
+  <p style={{
+    fontSize: '18px',
+    color: '#94a3b8',
+    marginBottom: '24px',
+    fontFamily: 'Inter'
+  }}>
+    A modern, bilingual personal portfolio website showcasing Federico Moretto's software development work and professional experience.
+  </p>
+  <div style={{
+    display: 'flex',
+    gap: '12px',
+    flexWrap: 'wrap'
+  }}>
+    <a 
+      href="/quickstart" 
+      style={{
+        background: '#2a7f66',
+        color: '#d1f0e4',
+        padding: '12px 24px',
+        borderRadius: '20px',
+        textDecoration: 'none',
+        fontWeight: 600,
+        fontFamily: 'Inter',
+        fontSize: '14px'
+      }}
+    >
+      Get Started
+    </a>
+    <a 
+      href="https://github.com/fedemoretto11/portfolio-moretto" 
+      style={{
+        background: 'transparent',
+        color: '#6e7284',
+        padding: '12px 24px',
+        borderRadius: '20px',
+        textDecoration: 'none',
+        fontWeight: 600,
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        fontFamily: 'Inter',
+        fontSize: '14px'
+      }}
+    >
+      View on GitHub
+    </a>
+  </div>
+</div>
 
-Get your documentation site up and running in minutes.
+## Key Features
 
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
+Portfolio Moretto is a production-ready personal portfolio built with modern web technologies and best practices.
 
-## Make it yours
-
-Design a docs site that looks great and empowers your users.
-
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
+<CardGroup cols={2}>
+  <Card title="Bilingual Support" icon="language">
+    Full Spanish and English translations powered by react-i18next
   </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
+  <Card title="Responsive Design" icon="mobile">
+    Mobile-first design with Tailwind CSS that looks great on any device
   </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
+  <Card title="Firebase Integration" icon="database">
+    Dynamic project data loaded from Firestore with image storage
   </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
+  <Card title="Modern Stack" icon="code">
+    Built with React, Vite, and modern JavaScript tooling
   </Card>
-</Columns>
+  <Card title="SEO Optimized" icon="magnifying-glass">
+    Semantic HTML structure with proper meta tags and descriptions
+  </Card>
+  <Card title="Smooth Navigation" icon="arrows-up-down">
+    Scroll-based navigation with smooth transitions between sections
+  </Card>
+</CardGroup>
 
-## Create beautiful pages
+## Quick Links
 
-Everything you need to create world-class documentation.
+<CardGroup cols={2}>
+  <Card title="Getting Started" icon="rocket" href="/quickstart">
+    Install dependencies and run the portfolio locally in minutes
+  </Card>
+  <Card title="Architecture Overview" icon="sitemap" href="/architecture/overview">
+    Understand the project structure and design patterns
+  </Card>
+  <Card title="Component Reference" icon="cube" href="/components/header">
+    Explore all React components and their usage
+  </Card>
+  <Card title="Customization Guide" icon="palette" href="/customization/content">
+    Learn how to customize content, translations, and styling
+  </Card>
+</CardGroup>
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
+## Tech Stack
 
-## Need inspiration?
+Portfolio Moretto leverages a carefully selected set of technologies:
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
+- **React 18** — Modern UI library with hooks and functional components
+- **Vite** — Fast build tool with hot module replacement
+- **Tailwind CSS** — Utility-first CSS framework for rapid styling
+- **Firebase** — Backend services for Firestore database and storage
+- **react-i18next** — Internationalization framework for bilingual support
+- **Bootstrap Icons** — Comprehensive icon library
+
+## Live Demo
+
+Visit the live portfolio at [federicomoretto.com.ar](https://federicomoretto.com.ar/)
+
+## Get Started
+
+<Card title="Quickstart Guide" icon="play" href="/quickstart" horizontal>
+  Follow our step-by-step guide to get the portfolio running locally
 </Card>

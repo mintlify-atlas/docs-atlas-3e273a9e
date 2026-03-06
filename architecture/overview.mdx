@@ -1,0 +1,320 @@
+---
+title: Architecture Overview
+description: Comprehensive overview of Portfolio Moretto's architecture, including project structure, build tooling, and core patterns
+---
+
+## Introduction
+
+Portfolio Moretto is a modern React-based portfolio website built with a focus on internationalization, clean component architecture, and optimal performance. The application showcases professional experience, skills, and projects through a multilingual interface.
+
+## Project Structure
+
+The project follows a feature-based folder structure that promotes modularity and maintainability:
+
+```
+portfolio-moretto/
+├── public/                    # Static assets
+├── src/
+│   ├── assets/               # Images and media files
+│   ├── components/
+│   │   ├── Header/          # Navigation and language switcher
+│   │   ├── Footer/          # Footer component
+│   │   ├── Main/            # Main content sections (Hero, About, etc.)
+│   │   ├── Projects/        # Project listing components
+│   │   ├── db/              # Firebase configuration and data layer
+│   │   └── dictionaries/    # Translation files (en.json, es.json)
+│   ├── styles/              # SCSS stylesheets
+│   ├── i18n.js              # i18next configuration
+│   ├── main.jsx             # Application entry point
+│   └── App.jsx              # Root component
+├── index.html               # HTML entry point
+├── package.json             # Dependencies and scripts
+├── vite.config.js           # Vite configuration
+├── tailwind.config.js       # Tailwind CSS configuration
+└── postcss.config.js        # PostCSS configuration
+```
+
+<Note>
+Components are organized by feature area (Header, Footer, Main, Projects) rather than by type, making it easier to locate and maintain related functionality.
+</Note>
+
+## Build Tooling
+
+### Vite
+
+The project uses Vite as its build tool and development server, providing fast hot module replacement (HMR) and optimized production builds.
+
+```javascript title="vite.config.js"
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+})
+```
+
+<CardGroup cols={2}>
+  <Card title="Development" icon="code">
+    Run `npm run dev` to start the Vite development server with instant HMR
+  </Card>
+  <Card title="Production" icon="box">
+    Run `npm run build` to create an optimized production bundle
+  </Card>
+</CardGroup>
+
+### PostCSS and Autoprefixer
+
+PostCSS processes CSS with Tailwind and automatically adds vendor prefixes for cross-browser compatibility.
+
+```javascript title="postcss.config.js"
+export default {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}
+```
+
+### Tailwind CSS
+
+Tailwind CSS provides utility-first styling with a custom configuration for content paths.
+
+```javascript title="tailwind.config.js"
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+```
+
+<Note>
+The content array tells Tailwind which files to scan for class names, enabling tree-shaking to remove unused styles in production.
+</Note>
+
+## Component Architecture
+
+### Composition Pattern
+
+The application follows a **composition-based architecture** where components are composed together to build complex UIs from simple, reusable pieces.
+
+```jsx title="src/App.jsx"
+import Footer from "./components/Footer/Footer"
+import Header from "./components/Header/Header"
+import MainContainer from "./components/Main/MainContainer"
+
+function App() {
+  return (
+    <>
+      <Header />
+      <MainContainer />
+      <Footer />
+    </>
+  )
+}
+
+export default App
+```
+
+The top-level App component composes three major sections:
+- **Header**: Navigation bar with language switching
+- **MainContainer**: Main content area with all portfolio sections
+- **Footer**: Copyright and attribution information
+
+### Container/Presentational Pattern
+
+The project uses the container/presentational pattern to separate data fetching logic from UI rendering:
+
+```jsx title="src/components/Main/MainContainer.jsx"
+import Main from "./Main"
+import Sidebar from "./Sidebar"
+
+function MainContainer() {
+  return (
+    <div className="relative flex w-full flex-col bg-gradient-to-b from-slate-950 via-slate-950 to-slate-900 sm:flex-row">
+      <div className="flex-1">
+        <Main />
+      </div>
+      <Sidebar />
+    </div>
+  )
+}
+```
+
+**Container components** (e.g., `ProjectListContainer`) handle:
+- Data fetching from Firebase
+- State management
+- Loading and error states
+
+**Presentational components** (e.g., `ProjectList`) handle:
+- Rendering UI based on props
+- User interactions
+- Visual styling
+
+## State Management
+
+### Local State with Hooks
+
+The application uses React's built-in hooks for state management rather than external libraries like Redux:
+
+<Accordion title="useState for Component State">
+```jsx title="src/components/Header/Header.jsx"
+import { useState } from "react"
+
+function Header() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  // Component logic...
+}
+```
+
+`useState` manages local UI state like menu open/closed status.
+</Accordion>
+
+<Accordion title="useEffect for Side Effects">
+```jsx title="src/components/Projects/ProjectListContainer.jsx"
+import { useEffect, useState } from "react"
+
+function ProjectListContainer({ type }) {
+  const [projectsList, setProjectsList] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    // Fetch projects from Firebase
+    getDocs(queryFilter)
+      .then((res) => {
+        const projectsMapped = res.docs.map((project) => ({
+          id: project.id,
+          ...project.data(),
+        }))
+        setProjectsList(projectsMapped)
+        setIsLoading(false)
+      })
+      .catch(() => {
+        setError("projects.error")
+        setIsLoading(false)
+      })
+  }, [type])
+}
+```
+
+`useEffect` handles asynchronous operations like data fetching, with dependency arrays to control when effects run.
+</Accordion>
+
+<Note>
+The project deliberately avoids complex state management libraries because the state requirements are simple and localized to individual components.
+</Note>
+
+## Routing Strategy
+
+### Hash-based Navigation
+
+Instead of a client-side router like React Router, Portfolio Moretto uses **hash-based navigation** with smooth scrolling:
+
+```jsx title="src/components/Header/Header.jsx"
+const handleNavClick = (event, hash) => {
+  event.preventDefault()
+  
+  const targetElement = document.querySelector(hash)
+  
+  if (targetElement) {
+    targetElement.scrollIntoView({ behavior: "smooth", block: "start" })
+    window.history.replaceState(null, "", hash)
+  }
+  
+  setIsMenuOpen(false)
+}
+
+const navLinks = [
+  { id: "home", label: t("header.home"), href: "#hero" },
+  { id: "about", label: t("header.about"), href: "#about" },
+  { id: "works", label: t("header.works"), href: "#works" },
+  // ...
+]
+```
+
+<CardGroup cols={2}>
+  <Card title="Benefits" icon="circle-check">
+    - No additional dependencies
+    - Simple implementation
+    - Native browser behavior
+    - Works without JavaScript
+  </Card>
+  <Card title="Trade-offs" icon="circle-info">
+    - Single page only
+    - No URL-based routing
+    - Limited to anchor navigation
+    - No route guards or lazy loading
+  </Card>
+</CardGroup>
+
+This approach is ideal for single-page portfolios where all content loads at once and sections are accessed through anchor links.
+
+## Application Entry Point
+
+The application initializes through a clear entry point sequence:
+
+```jsx title="src/main.jsx"
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import './i18n';              // Initialize i18next before app loads
+import App from './App.jsx'
+import './index.css'          // Import global styles
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <App />
+)
+```
+
+<Note>
+The `i18n.js` file is imported before the App component to ensure translations are loaded and initialized before any component attempts to use them.
+</Note>
+
+## Technology Stack
+
+The project leverages modern web technologies chosen for their performance, developer experience, and production readiness:
+
+| Category | Technology | Purpose |
+|----------|-----------|----------|
+| **Framework** | React 18.2 | UI component library |
+| **Build Tool** | Vite 4.4 | Fast dev server and bundler |
+| **Styling** | Tailwind CSS 3.3 | Utility-first CSS framework |
+| **i18n** | react-i18next 14.0 | Internationalization |
+| **Backend** | Firebase 10.3 | Database and file storage |
+| **Icons** | Bootstrap Icons 1.10 | Icon library |
+| **Language** | JavaScript (ES6+) | Primary programming language |
+
+## Performance Considerations
+
+<CardGroup cols={2}>
+  <Card title="Vite Hot Module Replacement" icon="bolt">
+    Instant feedback during development with sub-100ms HMR updates
+  </Card>
+  <Card title="Tailwind Purging" icon="broom">
+    Removes unused CSS in production, resulting in minimal stylesheet sizes
+  </Card>
+  <Card title="Component Code Splitting" icon="split">
+    Components are loaded on demand based on user navigation
+  </Card>
+  <Card title="Firebase SDK Tree-shaking" icon="tree">
+    Only imports required Firebase modules to reduce bundle size
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={3}>
+  <Card title="Components" href="/architecture/components" icon="layer-group">
+    Dive deep into component hierarchy and composition patterns
+  </Card>
+  <Card title="Internationalization" href="/architecture/internationalization" icon="globe">
+    Learn how multi-language support is implemented
+  </Card>
+  <Card title="Getting Started" href="/quickstart" icon="rocket">
+    Set up your development environment
+  </Card>
+</CardGroup>

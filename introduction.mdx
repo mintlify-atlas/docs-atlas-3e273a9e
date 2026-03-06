@@ -1,0 +1,229 @@
+---
+title: Introduction
+description: A modern, multilingual portfolio website showcasing projects and skills with Firebase integration
+---
+
+## Welcome to Portfolio Moretto
+
+Portfolio Moretto is a responsive, multilingual portfolio website built with modern web technologies. It serves as a professional showcase for Federico Moretto's projects, skills, and experience in software development.
+
+<CardGroup cols={2}>
+  <Card
+    title="Quick Start"
+    icon="rocket"
+    href="/quickstart"
+  >
+    Get your portfolio running locally in minutes
+  </Card>
+  <Card
+    title="Firebase Setup"
+    icon="database"
+    href="/development/firebase"
+  >
+    Configure Firebase for project storage and data
+  </Card>
+  <Card
+    title="Internationalization"
+    icon="globe"
+    href="/architecture/internationalization"
+  >
+    Learn how the multi-language system works
+  </Card>
+  <Card
+    title="Components"
+    icon="layer-group"
+    href="/components/header"
+  >
+    Explore the React component architecture
+  </Card>
+</CardGroup>
+
+## What is Portfolio Moretto?
+
+Portfolio Moretto is a personal portfolio website designed for software developers and tech professionals who want to showcase their work in an elegant, professional manner. The project demonstrates best practices in modern frontend development and provides a complete solution for managing and displaying project portfolios.
+
+### Key Features
+
+<CardGroup cols={2}>
+  <Card title="Multilingual Support" icon="language">
+    Built-in English and Spanish translations using react-i18next
+  </Card>
+  <Card title="Firebase Integration" icon="fire">
+    Firestore database for projects and Firebase Storage for images
+  </Card>
+  <Card title="Responsive Design" icon="mobile">
+    Fully responsive layout that adapts to all screen sizes
+  </Card>
+  <Card title="Modern UI" icon="palette">
+    Beautiful gradient-based design with Tailwind CSS and Bootstrap Icons
+  </Card>
+</CardGroup>
+
+## Technology Stack
+
+The portfolio is built with a carefully selected stack of modern web technologies:
+
+### Frontend Framework
+
+```json package.json
+{
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
+}
+```
+
+The application is powered by **React 18**, leveraging modern React features for optimal performance and developer experience.
+
+### Build Tool & Development
+
+```javascript vite.config.js
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+})
+```
+
+**Vite** provides lightning-fast hot module replacement (HMR) and optimized production builds.
+
+### Styling
+
+The project uses a powerful combination for styling:
+
+- **Tailwind CSS** - Utility-first CSS framework for rapid UI development
+- **Sass** - CSS preprocessor for advanced styling capabilities
+- **Bootstrap Icons** - Comprehensive icon library
+
+```javascript tailwind.config.js
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+```
+
+### Internationalization
+
+```javascript src/i18n.js
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+
+import translationES from './components/dictionaries/es.json'
+import translationEN from './components/dictionaries/en.json'
+
+const resources = {
+  es: { translation: translationES },
+  en: { translation: translationEN }
+}
+
+i18n
+  .use(initReactI18next)
+  .init({
+    resources,
+    lng: 'es',
+    debug: true,
+    keySeparator: false,
+    interpolation: {
+      escapeValue: false,
+    }
+  })
+```
+
+The **i18next** library powers the complete translation system, making the portfolio accessible to both English and Spanish speakers.
+
+### Backend & Storage
+
+```javascript src/components/db/data.js
+import { initializeApp } from "firebase/app";
+import { getFirestore } from 'firebase/firestore'
+import { getStorage } from "@firebase/storage";
+
+const firebaseConfig = {
+  apiKey: import.meta.env.VITE_apiKey,
+  authDomain: import.meta.env.VITE_authDomain,
+  projectId: import.meta.env.VITE_projectId,
+  storageBucket: import.meta.env.VITE_storageBucket,
+  messagingSenderId: import.meta.env.VITE_messagingSenderId,
+  appId: import.meta.env.VITE_appId,
+};
+
+const app = initializeApp(firebaseConfig);
+export const db = getFirestore(app)
+export const data = getStorage(app)
+```
+
+**Firebase** provides:
+- **Firestore** - NoSQL database for storing project information
+- **Firebase Storage** - Image hosting for project screenshots and assets
+
+## Architecture Overview
+
+The application follows a component-based architecture:
+
+```jsx src/App.jsx
+import Footer from "./components/Footer/Footer"
+import Header from "./components/Header/Header"
+import MainContainer from "./components/Main/MainContainer"
+
+function App() {
+  return (
+    <>
+      <Header />
+      <MainContainer />
+      <Footer />
+    </>
+  )
+}
+```
+
+### Component Structure
+
+- **Header** - Navigation with language switcher
+- **MainContainer** - Main content area with sidebar
+  - **Hero** - Introduction section with call-to-actions
+  - **About** - Personal story and highlights
+  - **Skills** - Technology stack and expertise
+  - **Works** - Professional experience timeline
+  - **ProjectsView** - Project showcase with filtering
+  - **Contact** - Contact information and social links
+- **Footer** - Copyright and additional links
+
+<Note>
+  Each major section is built as an independent, reusable React component, making the codebase maintainable and easy to customize.
+</Note>
+
+## Who Should Use This?
+
+Portfolio Moretto is ideal for:
+
+- **Frontend Developers** looking for a modern portfolio template
+- **Full-Stack Developers** wanting to showcase their complete skill set
+- **Students** building their first professional portfolio
+- **Freelancers** needing a professional online presence
+- **Anyone** interested in learning React, Vite, and Firebase integration
+
+## What You'll Learn
+
+By working with this project, you'll gain experience with:
+
+- Setting up a modern React + Vite development environment
+- Implementing internationalization with react-i18next
+- Integrating Firebase Firestore and Storage
+- Building responsive layouts with Tailwind CSS
+- Creating reusable React components
+- Managing environment variables securely
+- Deploying a static site to production
+
+## Next Steps
+
+<Card title="Get Started" icon="play" href="/quickstart">
+  Ready to dive in? Follow the quickstart guide to get the portfolio running on your local machine in just a few minutes.
+</Card>

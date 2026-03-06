@@ -1,0 +1,443 @@
+---
+title: "Experience Component (Works)"
+description: "Professional timeline with achievements and technologies"
+icon: "briefcase"
+---
+
+## Overview
+
+The Works component (representing Experience) displays Federico's professional timeline with detailed information about each role, including responsibilities, achievements, and technologies used. It renders work experiences from translation data as timeline cards.
+
+**Location:** `src/components/Main/Works.jsx`
+
+<Note>
+  The component is named "Works" in the codebase but represents the Experience/Career section in the UI.
+</Note>
+
+## Key Features
+
+<CardGroup cols={2}>
+  <Card title="Timeline Display" icon="timeline">
+    Chronological work history with role, company, and period information
+  </Card>
+  <Card title="Achievement Lists" icon="list-check">
+    Bullet-pointed accomplishments with arrow icons for each position
+  </Card>
+  <Card title="Technology Tags" icon="tag">
+    Stack badges showing technologies used in each role
+  </Card>
+  <Card title="Rich Content" icon="file-lines">
+    Role summaries and detailed achievement descriptions
+  </Card>
+</CardGroup>
+
+## Component Structure
+
+```jsx
+function Works() {
+  const { t } = useTranslation()
+  const works = t("works.items", { returnObjects: true })
+
+  return (
+    <section id="works" className="scroll-mt-32 px-6">
+      {/* Content */}
+    </section>
+  )
+}
+```
+
+### Translation Data Structure
+
+```javascript
+// Works items - array of job objects
+[
+  {
+    "role": "Technical Support & Software Developer",
+    "company": "Asince SRL",
+    "period": "2022 — Present",
+    "summary": "I keep the company's core platform stable while developing new features for fintech and ERP products.",
+    "achievements": [
+      "Handled and resolved technical support tickets.",
+      "Developed and implemented hotfixes for production environments.",
+      "Monitored and maintained servers and databases.",
+      "Developed new features for web applications."
+    ],
+    "technologies": ["C# .NET", "Vue", "TypeScript", "Azure", "Oracle SQL", "Crystal Reports"]
+  },
+  {
+    "role": "Freelance Full-Stack Developer",
+    "company": "Independent Projects",
+    "period": "2019 — 2022",
+    "summary": "Designed and developed custom websites for small businesses — from concept to launch.",
+    "achievements": [
+      "Built responsive sites and PWAs that improved visibility and lead generation for local clients.",
+      "Automated back-office processes with Firebase, cutting manual work by up to 50%.",
+      "Helped non-technical clients adopt analytics and iterative improvement practices."
+    ],
+    "technologies": ["Next.js", "Firebase", "Tailwind", "Node.js"]
+  }
+]
+```
+
+## Layout Structure
+
+```jsx
+<section id="works" className="scroll-mt-32 px-6">
+  <div className="mx-auto flex max-w-6xl flex-col gap-8 rounded-3xl border border-slate-800 bg-slate-900/50 px-8 py-12 shadow-xl shadow-slate-950/40 backdrop-blur">
+    {/* Section header */}
+    
+    <div className="flex flex-col gap-6">
+      {/* Work experience cards */}
+    </div>
+  </div>
+</section>
+```
+
+## Section Header
+
+```jsx
+<div className="flex flex-col gap-2">
+  <span className="text-sm uppercase tracking-[0.3em] text-sky-300">
+    {t("works.subtitle")}
+  </span>
+  <h2 className="text-3xl font-semibold text-white sm:text-4xl">
+    {t("works.title")}
+  </h2>
+  <p className="max-w-3xl text-base text-slate-300">
+    {t("works.description")}
+  </p>
+</div>
+```
+
+**Output:**
+- Subtitle: "CAREER" (sky blue)
+- Title: "Professional experience" (responsive size)
+- Description: Context about work history
+
+## Work Experience Card
+
+### Card Container
+
+```jsx
+<article
+  key={`work-${index}-${work?.company}`}
+  className="relative flex flex-col gap-4 rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-xl shadow-slate-950/40"
+>
+  {/* Card content */}
+</article>
+```
+
+Each work experience is wrapped in an `<article>` tag for semantic HTML.
+
+### Header Section
+
+```jsx
+<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+  <div>
+    <h3 className="text-xl font-semibold text-white">{work?.role}</h3>
+    <p className="text-sm uppercase tracking-[0.3em] text-slate-400">{work?.company}</p>
+  </div>
+  <span className="inline-flex items-center justify-center rounded-full border border-slate-700 bg-slate-900/60 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-slate-300">
+    {work?.period}
+  </span>
+</div>
+```
+
+<Tabs>
+  <Tab title="Mobile Layout">
+    ```
+    ┌─────────────────────────────────────┐
+    │ Technical Support & Software Dev    │
+    │ ASINCE SRL                          │
+    │ 2022 — PRESENT                      │
+    └─────────────────────────────────────┘
+    ```
+    
+    Stacks vertically with gap
+  </Tab>
+  <Tab title="Desktop Layout">
+    ```
+    ┌──────────────────────────────────────────────────┐
+    │ Technical Support & Software Dev  [2022 — PRESENT]│
+    │ ASINCE SRL                                       │
+    └──────────────────────────────────────────────────┘
+    ```
+    
+    Period badge floats to the right
+  </Tab>
+</Tabs>
+
+### Summary Section
+
+```jsx
+{work?.summary && <p className="text-sm leading-relaxed text-slate-200">{work.summary}</p>}
+```
+
+Conditionally renders if a summary is provided.
+
+## Achievements Section
+
+```jsx
+{Array.isArray(work?.achievements) && work.achievements.length > 0 && (
+  <ul className="space-y-3 text-sm text-slate-200">
+    {work.achievements.map((achievement, achievementIndex) => (
+      <li key={`work-${index}-achievement-${achievementIndex}`} className="flex items-start gap-3">
+        <span className="mt-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300">
+          <i className="bi bi-arrow-right" aria-hidden="true" />
+        </span>
+        <span>{achievement}</span>
+      </li>
+    ))}
+  </ul>
+)}
+```
+
+<Accordion title="Achievement list styling">
+  **Structure:**
+  - Each achievement is a list item with flex layout
+  - Icon badge on the left (emerald circular background)
+  - Arrow icon (`bi-arrow-right`) for directional indication
+  - Text content aligned to start with proper gap
+  
+  **Visual:**
+  ```
+  → Handled and resolved technical support tickets.
+  → Developed and implemented hotfixes for production.
+  → Monitored and maintained servers and databases.
+  → Developed new features for web applications.
+  ```
+</Accordion>
+
+<Note>
+  The `space-y-3` utility creates vertical spacing between achievements without requiring gap on a flex container.
+</Note>
+
+## Technologies Section
+
+```jsx
+{Array.isArray(work?.technologies) && work.technologies.length > 0 && (
+  <ul className="flex flex-wrap gap-2">
+    {work.technologies.map((tech, techIndex) => (
+      <li
+        key={`work-${index}-tech-${techIndex}`}
+        className="rounded-full border border-violet-500/60 bg-violet-500/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.25em] text-violet-200"
+      >
+        {tech}
+      </li>
+    ))}
+  </ul>
+)}
+```
+
+**Technology badge styling:**
+- **Violet theme**: Different from skills (sky) to visually distinguish work tech
+- **Pill shape**: `rounded-full` with padding
+- **Wrapping**: `flex-wrap` allows natural flow across lines
+
+<CardGroup cols={2}>
+  <Card title="Current Role Tech" icon="code">
+    C# .NET, Vue, TypeScript, Azure, Oracle SQL, Crystal Reports
+  </Card>
+  <Card title="Freelance Tech" icon="laptop-code">
+    Next.js, Firebase, Tailwind, Node.js
+  </Card>
+</CardGroup>
+
+## Complete Card Example
+
+```jsx
+<article className="relative flex flex-col gap-4 rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-xl shadow-slate-950/40">
+  {/* Header: Role, Company, Period */}
+  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h3 className="text-xl font-semibold text-white">Technical Support & Software Developer</h3>
+      <p className="text-sm uppercase tracking-[0.3em] text-slate-400">ASINCE SRL</p>
+    </div>
+    <span className="inline-flex items-center justify-center rounded-full border border-slate-700 bg-slate-900/60 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-slate-300">
+      2022 — PRESENT
+    </span>
+  </div>
+
+  {/* Summary */}
+  <p className="text-sm leading-relaxed text-slate-200">
+    I keep the company's core platform stable while developing new features for fintech and ERP products.
+  </p>
+
+  {/* Achievements */}
+  <ul className="space-y-3 text-sm text-slate-200">
+    <li className="flex items-start gap-3">
+      <span className="mt-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300">
+        <i className="bi bi-arrow-right" aria-hidden="true" />
+      </span>
+      <span>Handled and resolved technical support tickets.</span>
+    </li>
+    {/* More achievements... */}
+  </ul>
+
+  {/* Technologies */}
+  <ul className="flex flex-wrap gap-2">
+    <li className="rounded-full border border-violet-500/60 bg-violet-500/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.25em] text-violet-200">
+      C# .NET
+    </li>
+    {/* More technologies... */}
+  </ul>
+</article>
+```
+
+## Translation Keys
+
+| Key | English | Spanish |
+|-----|---------|----------|
+| `works.subtitle` | Career | Carrera |
+| `works.title` | Professional experience | Experiencia profesional |
+| `works.description` | A look at the teams and projects... | Un vistazo a los equipos y proyectos... |
+| `works.items` | Array of work objects | Array de objetos de trabajo |
+
+## Styling Details
+
+### Color Coding System
+
+<Tabs>
+  <Tab title="Text Hierarchy">
+    - **Role**: `text-white` (most prominent)
+    - **Company**: `text-slate-400` (muted, uppercase)
+    - **Content**: `text-slate-200` (readable body)
+    - **Period**: `text-slate-300` (badge text)
+  </Tab>
+  <Tab title="Achievement Icons">
+    - Background: `bg-emerald-500/20`
+    - Icon color: `text-emerald-300`
+    - Border: Circular (`rounded-full`)
+  </Tab>
+  <Tab title="Technology Badges">
+    - Border: `border-violet-500/60`
+    - Background: `bg-violet-500/10`
+    - Text: `text-violet-200`
+    
+    **Note:** Violet distinguishes work tech from general skills (sky blue)
+  </Tab>
+</Tabs>
+
+### Spacing Pattern
+
+```jsx
+// Between cards
+gap-6          // Vertical spacing between work items
+
+// Within cards
+gap-4          // Between major sections (header, summary, achievements, tech)
+gap-3          // Within header (role/company and period)
+space-y-3      // Between achievement items
+gap-2          // Between technology badges
+```
+
+## Responsive Behavior
+
+```
+Mobile:
+┌────────────────────────────────┐
+│ Role Title                     │
+│ COMPANY NAME                   │
+│ PERIOD                         │
+│                                │
+│ Summary paragraph...           │
+│                                │
+│ → Achievement 1                │
+│ → Achievement 2                │
+│ → Achievement 3                │
+│                                │
+│ [Tech1] [Tech2] [Tech3]        │
+│ [Tech4] [Tech5]                │
+└────────────────────────────────┘
+
+Desktop:
+┌────────────────────────────────────────────┐
+│ Role Title                     [PERIOD]    │
+│ COMPANY NAME                               │
+│                                            │
+│ Summary paragraph...                       │
+│                                            │
+│ → Achievement 1                            │
+│ → Achievement 2                            │
+│ → Achievement 3                            │
+│                                            │
+│ [Tech1] [Tech2] [Tech3] [Tech4] [Tech5]    │
+└────────────────────────────────────────────┘
+```
+
+## Accessibility
+
+- **Semantic HTML**: `<article>` for each work item
+- **Heading hierarchy**: `<h2>` for section, `<h3>` for roles
+- **List structure**: `<ul>` and `<li>` for achievements and technologies
+- **Icon labels**: `aria-hidden="true"` on decorative icons
+- **Scroll margin**: `scroll-mt-32` for anchor navigation
+- **High contrast**: Text colors meet WCAG standards
+
+## Conditional Rendering
+
+All subsections use optional chaining and conditional rendering:
+
+```jsx
+// Summary: Only if provided
+{work?.summary && <p>...</p>}
+
+// Achievements: Only if array exists and has items
+{Array.isArray(work?.achievements) && work.achievements.length > 0 && (
+  <ul>...</ul>
+)}
+
+// Technologies: Only if array exists and has items
+{Array.isArray(work?.technologies) && work.technologies.length > 0 && (
+  <ul>...</ul>
+)}
+```
+
+<Warning>
+  This ensures the component gracefully handles incomplete data without breaking or showing empty sections.
+</Warning>
+
+## Integration Example
+
+```jsx
+import Works from "./components/Main/Works"
+
+function MainContent() {
+  return (
+    <main>
+      <Hero />
+      <About />
+      <Works />
+      {/* Other sections */}
+    </main>
+  )
+}
+```
+
+## Customization
+
+To add or modify work experiences, update the translation files:
+
+```json
+{
+  "works.items": [
+    {
+      "role": "New Position Title",
+      "company": "Company Name",
+      "period": "2023 — Present",
+      "summary": "Brief role description",
+      "achievements": [
+        "Key accomplishment 1",
+        "Key accomplishment 2"
+      ],
+      "technologies": ["Tech1", "Tech2", "Tech3"]
+    }
+  ]
+}
+```
+
+## Dependencies
+
+- **react-i18next**: Translation management
+- **Tailwind CSS**: Utility styling
+- **Bootstrap Icons**: Icon library (bi-arrow-right)

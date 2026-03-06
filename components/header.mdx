@@ -1,0 +1,220 @@
+---
+title: "Header Component"
+description: "Sticky navigation header with responsive menu and language switcher"
+icon: "bars"
+---
+
+## Overview
+
+The Header component provides the main navigation interface for the portfolio site. It features a sticky positioning, responsive mobile menu, smooth scroll navigation, and language toggle functionality.
+
+**Location:** `src/components/Header/Header.jsx`
+
+## Key Features
+
+<CardGroup cols={2}>
+  <Card title="Smooth Scroll Navigation" icon="arrow-down">
+    Implements smooth scrolling behavior with hash-based routing for seamless section navigation
+  </Card>
+  <Card title="Responsive Design" icon="mobile">
+    Collapsible hamburger menu for mobile devices with animated transitions
+  </Card>
+  <Card title="Language Toggle" icon="language">
+    Built-in internationalization support with English/Spanish language switching
+  </Card>
+  <Card title="Sticky Positioning" icon="thumbtack">
+    Remains fixed at the top of the viewport with backdrop blur effect
+  </Card>
+</CardGroup>
+
+## Component Structure
+
+### State Management
+
+The component uses React hooks for state management:
+
+```jsx
+const { t, i18n } = useTranslation()
+const [isMenuOpen, setIsMenuOpen] = useState(false)
+```
+
+- **`isMenuOpen`**: Controls mobile menu visibility
+- **`t`**: Translation function from react-i18next
+- **`i18n`**: i18n instance for language switching
+
+### Navigation Links
+
+Navigation items are defined as an array with translation keys:
+
+```jsx
+const navLinks = [
+  { id: "home", label: t("header.home"), href: "#hero" },
+  { id: "about", label: t("header.about"), href: "#about" },
+  { id: "works", label: t("header.works"), href: "#works" },
+  { id: "tech", label: t("header.technology"), href: "#tech" },
+  { id: "projects", label: t("header.projects"), href: "#projects" },
+  { id: "contact", label: t("header.contact"), href: "#contact" },
+]
+```
+
+## Functionality
+
+### Smooth Scroll Handler
+
+The `handleNavClick` function provides smooth scrolling with hash updates:
+
+```jsx
+const handleNavClick = (event, hash) => {
+  event.preventDefault()
+  
+  const targetElement = document.querySelector(hash)
+  
+  if (targetElement) {
+    targetElement.scrollIntoView({ behavior: "smooth", block: "start" })
+    window.history.replaceState(null, "", hash)
+  }
+  
+  setIsMenuOpen(false)
+}
+```
+
+<Note>
+  The menu automatically closes after navigation on mobile devices for better UX.
+</Note>
+
+### Language Toggle
+
+Language switching between English and Spanish:
+
+```jsx
+const toggleLanguage = () => {
+  const nextLanguage = i18n.language === "es" ? "en" : "es"
+  i18n.changeLanguage(nextLanguage)
+}
+```
+
+## Styling
+
+### Header Container
+
+```jsx
+<header 
+  id="index" 
+  className="sticky top-0 z-50 border-b border-slate-800 bg-slate-950/80 backdrop-blur"
+>
+```
+
+**Key classes:**
+- `sticky top-0 z-50`: Fixed positioning at top with high z-index
+- `bg-slate-950/80`: Semi-transparent dark background
+- `backdrop-blur`: Glassmorphism effect for content behind header
+
+### Logo Section
+
+```jsx
+<a
+  href="#hero"
+  onClick={(event) => handleNavClick(event, "#hero")}
+  className="flex items-center gap-3"
+>
+  <img
+    src={logo}
+    alt="Federico Moretto logo"
+    className="h-11 w-11 rounded-full border border-slate-800 bg-slate-900 object-cover"
+  />
+  <span className="hidden text-sm font-semibold uppercase tracking-[0.3em] text-slate-200 sm:inline">
+    Federico Moretto
+  </span>
+</a>
+```
+
+### Responsive Menu Toggle
+
+The mobile menu uses conditional classes for animation:
+
+```jsx
+<nav
+  className={`mx-auto flex w-full max-w-6xl flex-col gap-4 px-6 pb-6 transition-[max-height,opacity] duration-300 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:pb-0 ${
+    isMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0 sm:max-h-full sm:opacity-100"
+  }`}
+>
+```
+
+## Translation Keys
+
+<Accordion title="View all translation keys used">
+  | Key | English | Spanish |
+  |-----|---------|----------|
+  | `header.home` | Home | Inicio |
+  | `header.about` | About | Sobre mí |
+  | `header.technology` | Skills | Skills |
+  | `header.works` | Experience | Experiencia |
+  | `header.projects` | Projects | Proyectos |
+  | `header.contact` | Contact | Contacto |
+  | `header.openMenu` | Open menu | Abrir menú |
+  | `header.closeMenu` | Close menu | Cerrar menú |
+  | `changeLanguage` | ES / EN | EN / ES |
+</Accordion>
+
+## Accessibility Features
+
+- **ARIA labels** on menu toggle button for screen readers
+- **Semantic HTML** with proper `<header>` and `<nav>` tags
+- **Keyboard navigation** support for all interactive elements
+- **Focus states** with hover effects on all links and buttons
+
+```jsx
+<button
+  type="button"
+  onClick={() => setIsMenuOpen((value) => !value)}
+  className="..."
+  aria-label={isMenuOpen ? t("header.closeMenu") : t("header.openMenu")}
+>
+  <i className={`bi ${isMenuOpen ? "bi-x" : "bi-list"} text-2xl`} aria-hidden="true" />
+</button>
+```
+
+## Responsive Breakpoints
+
+<Tabs>
+  <Tab title="Mobile (< 640px)">
+    - Hamburger menu icon visible
+    - Language toggle moves inside collapsible menu
+    - Name text hidden, only logo shown
+    - Vertical menu layout
+  </Tab>
+  <Tab title="Desktop (≥ 640px)">
+    - Full horizontal navigation visible
+    - Language toggle in top-right corner
+    - Name text visible next to logo
+    - Horizontal menu layout
+  </Tab>
+</Tabs>
+
+## Integration Example
+
+The Header is typically rendered at the top of the main application:
+
+```jsx
+import Header from "./components/Header/Header"
+
+function App() {
+  return (
+    <>
+      <Header />
+      {/* Rest of the application */}
+    </>
+  )
+}
+```
+
+<Warning>
+  Ensure react-i18next is properly configured before using this component. The component depends on i18n provider context.
+</Warning>
+
+## Dependencies
+
+- **React**: useState hook for state management
+- **react-i18next**: Translation and language switching
+- **Bootstrap Icons**: Icon library for menu and visual elements
+- **Tailwind CSS**: Utility-first styling

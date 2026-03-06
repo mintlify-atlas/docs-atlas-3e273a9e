@@ -1,0 +1,409 @@
+---
+title: "Skills Component"
+description: "Technology stack showcase with grouped skills and highlights"
+icon: "code"
+---
+
+## Overview
+
+The Skills component displays Federico's technology stack organized into three main categories: Front-end, Back-end, and Tools. It features skill badges grouped by category and additional highlights about development practices.
+
+**Location:** `src/components/Main/Skills.jsx`
+
+## Key Features
+
+<CardGroup cols={2}>
+  <Card title="Grouped Technologies" icon="layer-group">
+    Skills organized into Front-end, Back-end, and Tools categories
+  </Card>
+  <Card title="Badge Display" icon="tag">
+    Technologies shown as styled pill badges with consistent branding
+  </Card>
+  <Card title="Practice Highlights" icon="star">
+    Key development practices and methodologies displayed below skills
+  </Card>
+  <Card title="Responsive Grid" icon="grid">
+    Adaptive layout from single column to three-column grid
+  </Card>
+</CardGroup>
+
+## Component Structure
+
+```jsx
+function Skills() {
+  const { t } = useTranslation()
+  const groups = t("skills.groups", { returnObjects: true })
+  const highlights = t("skills.highlights", { returnObjects: true })
+
+  return (
+    <section id="tech" className="scroll-mt-32 px-6">
+      {/* Content */}
+    </section>
+  )
+}
+```
+
+### Translation Data Structure
+
+```javascript
+// Skills groups - array of objects
+[
+  {
+    "title": "Front-end",
+    "items": ["HTML", "CSS", "JavaScript", "TypeScript", "Tailwind CSS", "React", "Next.js", "React Native"]
+  },
+  {
+    "title": "Back-end",
+    "items": ["C# .NET", "Java", "Spring Boot", "Python", "Node.js"]
+  },
+  {
+    "title": "Tools",
+    "items": ["SQL", "Firebase", "Git", "GitHub", "Azure", "Jira"]
+  }
+]
+
+// Highlights - array of strings
+[
+  "Set up CI/CD pipelines and automated testing to ensure reliable releases.",
+  "Encourage component-driven development with reusable patterns and accessibility in mind.",
+  "Collaborate closely with business teams to turn rules into maintainable features."
+]
+```
+
+## Layout Structure
+
+```jsx
+<section id="tech" className="scroll-mt-32 px-6">
+  <div className="mx-auto flex max-w-6xl flex-col gap-8 rounded-3xl border border-slate-800 bg-slate-900/50 px-8 py-12 shadow-xl shadow-slate-950/40 backdrop-blur">
+    {/* Section header */}
+    {/* Skills groups grid */}
+    {/* Highlights grid */}
+  </div>
+</section>
+```
+
+## Section Header
+
+```jsx
+<div className="flex flex-col gap-2">
+  <span className="text-sm uppercase tracking-[0.3em] text-sky-300">
+    {t("skills.subtitle")}
+  </span>
+  <h2 className="text-3xl font-semibold text-white sm:text-4xl">
+    {t("skills.title")}
+  </h2>
+  <p className="max-w-3xl text-base text-slate-300">
+    {t("skills.description")}
+  </p>
+</div>
+```
+
+**Output:**
+- Subtitle: "TOOLKIT" (sky blue)
+- Title: "Skills & technologies" (responsive size)
+- Description: Backend development focus statement
+
+## Skills Groups
+
+### Group Container
+
+```jsx
+<div className="grid gap-6 md:grid-cols-3">
+  {Array.isArray(groups) &&
+    groups.map((group, index) => (
+      <div
+        key={`skills-group-${index}`}
+        className="flex flex-col gap-4 rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-inner shadow-slate-950/40"
+      >
+        <h3 className="text-lg font-semibold text-white">{group?.title}</h3>
+        <ul className="flex flex-wrap gap-2">
+          {/* Skill badges */}
+        </ul>
+      </div>
+    ))}
+</div>
+```
+
+<Note>
+  Groups render in a **3-column grid** on medium+ screens (`md:grid-cols-3`) and stack vertically on mobile.
+</Note>
+
+### Individual Skill Badges
+
+```jsx
+<ul className="flex flex-wrap gap-2">
+  {Array.isArray(group?.items) &&
+    group.items.map((item, itemIndex) => (
+      <li
+        key={`skills-${index}-${itemIndex}`}
+        className="rounded-full border border-sky-500/60 bg-sky-500/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.25em] text-sky-200"
+      >
+        {item}
+      </li>
+    ))}
+</ul>
+```
+
+<Tabs>
+  <Tab title="Badge Styling">
+    ```css
+    .skill-badge {
+      /* Shape */
+      border-radius: 9999px; /* rounded-full */
+      
+      /* Colors */
+      border: 1px solid rgb(14 165 233 / 0.6); /* sky-500/60 */
+      background: rgb(14 165 233 / 0.1); /* sky-500/10 */
+      color: rgb(186 230 253); /* sky-200 */
+      
+      /* Typography */
+      font-size: 0.75rem; /* text-xs */
+      font-weight: 500; /* font-medium */
+      text-transform: uppercase;
+      letter-spacing: 0.25em; /* tracking-[0.25em] */
+      
+      /* Spacing */
+      padding: 0.25rem 0.75rem; /* px-3 py-1 */
+    }
+    ```
+  </Tab>
+  <Tab title="Visual Example">
+    ```
+    ┌────────────────────────────┐
+    │  Front-end                 │
+    │                            │
+    │  [HTML] [CSS] [JavaScript] │
+    │  [TypeScript] [React]      │
+    │  [Next.js] [Tailwind CSS]  │
+    │  [React Native]            │
+    └────────────────────────────┘
+    ```
+    
+    Each badge wraps naturally with `flex-wrap`.
+  </Tab>
+</Tabs>
+
+## Skills by Category
+
+<CardGroup cols={3}>
+  <Card title="Front-end" icon="browser">
+    - HTML
+    - CSS
+    - JavaScript
+    - TypeScript
+    - Tailwind CSS
+    - React
+    - Next.js
+    - React Native
+  </Card>
+  <Card title="Back-end" icon="server">
+    - C# .NET
+    - Java
+    - Spring Boot
+    - Python
+    - Node.js
+  </Card>
+  <Card title="Tools" icon="wrench">
+    - SQL
+    - Firebase
+    - Git
+    - GitHub
+    - Azure
+    - Jira
+  </Card>
+</CardGroup>
+
+## Highlights Section
+
+```jsx
+<div className="grid gap-4 md:grid-cols-2">
+  {Array.isArray(highlights) &&
+    highlights.map((highlight, index) => (
+      <div
+        key={`skills-highlight-${index}`}
+        className="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900/80 via-slate-900/40 to-slate-900/80 px-5 py-4 text-sm text-slate-200 shadow-inner shadow-slate-950/40"
+      >
+        {highlight}
+      </div>
+    ))}
+</div>
+```
+
+**Highlights showcase:**
+- CI/CD and automated testing practices
+- Component-driven development approach
+- Business collaboration methodology
+
+<Accordion title="Gradient styling details">
+  Highlight cards use a **diagonal gradient** background:
+  
+  ```css
+  background: linear-gradient(
+    to bottom right,
+    rgb(15 23 42 / 0.8),  /* from-slate-900/80 */
+    rgb(15 23 42 / 0.4),  /* via-slate-900/40 */
+    rgb(15 23 42 / 0.8)   /* to-slate-900/80 */
+  );
+  ```
+  
+  This creates a subtle "highlight" effect in the center of each card.
+</Accordion>
+
+## Translation Keys
+
+| Key | English | Spanish |
+|-----|---------|----------|
+| `skills.subtitle` | Toolkit | Toolkit |
+| `skills.title` | Skills & technologies | Skills y tecnologías |
+| `skills.description` | Passionate about backend development... | Apasionado por el desarrollo backend... |
+
+## Styling Details
+
+### Container Card
+
+```jsx
+className="mx-auto flex max-w-6xl flex-col gap-8 rounded-3xl border border-slate-800 bg-slate-900/50 px-8 py-12 shadow-xl shadow-slate-950/40 backdrop-blur"
+```
+
+**Properties:**
+- Max width: `1152px` (max-w-6xl)
+- Vertical gap: `2rem` (gap-8) between sections
+- Padding: `2rem` horizontal, `3rem` vertical
+- Border radius: `1.5rem` (rounded-3xl)
+- Semi-transparent background with backdrop blur
+
+### Color System
+
+<Tabs>
+  <Tab title="Skill Badges">
+    **Sky blue theme:**
+    - Border: `border-sky-500/60`
+    - Background: `bg-sky-500/10`
+    - Text: `text-sky-200`
+    
+    Creates a cohesive tech-focused color scheme.
+  </Tab>
+  <Tab title="Group Cards">
+    **Slate theme:**
+    - Border: `border-slate-800`
+    - Background: `bg-slate-900/70`
+    - Shadow: `shadow-inner shadow-slate-950/40`
+    
+    Provides subtle depth without overwhelming content.
+  </Tab>
+  <Tab title="Highlights">
+    **Gradient slate:**
+    - Background: Diagonal gradient from dark to light to dark
+    - Border: `border-slate-800`
+    - Inner shadow for inset effect
+  </Tab>
+</Tabs>
+
+## Responsive Grid Behavior
+
+```
+Mobile (< 768px):
+┌──────────────────────┐
+│  Front-end           │
+│  [Skills badges]     │
+└──────────────────────┘
+┌──────────────────────┐
+│  Back-end            │
+│  [Skills badges]     │
+└──────────────────────┘
+┌──────────────────────┐
+│  Tools               │
+│  [Skills badges]     │
+└──────────────────────┘
+
+┌──────────────────────┐
+│  Highlight 1         │
+└──────────────────────┘
+┌──────────────────────┐
+│  Highlight 2         │
+└──────────────────────┘
+┌──────────────────────┐
+│  Highlight 3         │
+└──────────────────────┘
+
+Desktop (≥ 768px):
+┌────────┐ ┌────────┐ ┌────────┐
+│Front-  │ │Back-   │ │Tools   │
+│end     │ │end     │ │        │
+│[badges]│ │[badges]│ │[badges]│
+└────────┘ └────────┘ └────────┘
+
+┌──────────────┐ ┌──────────────┐
+│ Highlight 1  │ │ Highlight 2  │
+└──────────────┘ └──────────────┘
+┌──────────────┐
+│ Highlight 3  │
+└──────────────┘
+```
+
+## Accessibility
+
+- **Semantic HTML**: `<section>`, `<h2>`, `<h3>`, `<ul>`, `<li>` tags
+- **Heading hierarchy**: Proper h2 → h3 nesting
+- **List structure**: Skills wrapped in proper lists
+- **Scroll margin**: `scroll-mt-32` for anchor navigation
+- **Color contrast**: High contrast between text and backgrounds
+- **No interactive elements**: Pure informational display
+
+## Key Design Decisions
+
+<CardGroup cols={2}>
+  <Card title="Badge Wrapping" icon="text-width">
+    Uses `flex-wrap` to naturally flow badges across lines, adapting to container width without fixed breakpoints
+  </Card>
+  <Card title="Consistent Sizing" icon="equals">
+    All group cards have equal height in the grid, creating visual balance
+  </Card>
+  <Card title="Sky Theme" icon="cloud">
+    Sky blue accent for tech skills differentiates them from other sections (emerald for CTAs, violet for work tech)
+  </Card>
+  <Card title="Inner Shadows" icon="cube">
+    Subtle inner shadows create depth and make cards feel "inset" into the page
+  </Card>
+</CardGroup>
+
+## Integration Example
+
+```jsx
+import Skills from "./components/Main/Skills"
+
+function MainContent() {
+  return (
+    <main>
+      <Hero />
+      <About />
+      <Skills />
+      {/* Other sections */}
+    </main>
+  )
+}
+```
+
+## Customization
+
+To add new skills or modify categories, update the translation files:
+
+```json
+{
+  "skills.groups": [
+    {
+      "title": "New Category",
+      "items": ["Tech1", "Tech2", "Tech3"]
+    }
+  ]
+}
+```
+
+<Warning>
+  Keep skill names concise (1-2 words) to maintain proper badge sizing and wrapping behavior.
+</Warning>
+
+## Dependencies
+
+- **react-i18next**: Translation management
+- **Tailwind CSS**: Utility styling

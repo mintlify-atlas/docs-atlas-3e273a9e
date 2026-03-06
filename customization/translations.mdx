@@ -1,0 +1,592 @@
+---
+title: Translation System
+description: Learn how Portfolio Moretto's multilingual system works and how to add new languages or customize translations.
+icon: 'language'
+---
+
+## Overview
+
+Portfolio Moretto uses **react-i18next** for internationalization, making it easy to support multiple languages. The portfolio comes with English and Spanish translations out of the box.
+
+## Translation File Structure
+
+All translations are stored as JSON files in the dictionaries folder:
+
+```bash
+source/src/components/dictionaries/
+├── en.json  # English translations
+└── es.json  # Spanish translations
+```
+
+### Example Translation File
+
+Here's a portion of the English translation file:
+
+```json en.json
+{
+  "header.home": "Home",
+  "header.about": "About",
+  "header.technology": "Skills",
+  "header.works": "Experience",
+  "header.projects": "Projects",
+  "header.contact": "Contact",
+  "hero.tagline": "Software Developer",
+  "hero.title": "I turn ideas into software that truly works",
+  "hero.description": "I design, build, and maintain digital products that blend simple interfaces with solid, long-lasting architecture.",
+  "hero.highlights": [
+    { "label": "Years in tech", "value": "2+" },
+    { "label": "Projects delivered", "value": "5+" },
+    { "label": "Based in", "value": "Argentina" }
+  ],
+  "about.subtitle": "Story",
+  "about.title": "From tech support to full-stack developer"
+}
+```
+
+And the corresponding Spanish version:
+
+```json es.json
+{
+  "header.home": "Inicio",
+  "header.about": "Sobre mí",
+  "header.technology": "Skills",
+  "header.works": "Experiencia",
+  "header.projects": "Proyectos",
+  "header.contact": "Contacto",
+  "hero.tagline": "Software Developer",
+  "hero.title": "Transformo ideas en software que realmente funciona",
+  "hero.description": "Diseño, desarrollo y mantengo productos digitales que combinan interfaces simples con una arquitectura sólida y pensada para durar.",
+  "hero.highlights": [
+    { "label": "Años en tecnología", "value": "2+" },
+    { "label": "Proyectos entregados", "value": "5+" },
+    { "label": "Desde", "value": "Argentina" }
+  ],
+  "about.subtitle": "Historia",
+  "about.title": "De soporte técnico a desarrollador full-stack"
+}
+```
+
+<Note>
+  Notice how both files have **identical keys** but different values. This is crucial for the translation system to work correctly.
+</Note>
+
+## i18n Configuration
+
+The translation system is configured in `src/i18n.js`:
+
+```javascript i18n.js
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+
+import translationES from './components/dictionaries/es.json'
+import translationEN from './components/dictionaries/en.json'
+
+const resources = {
+  es: {
+    translation: translationES
+  },
+  en: {
+    translation: translationEN
+  }
+}
+
+i18n
+  .use(initReactI18next)
+  .init({
+    resources,
+    lng: 'es',  // Default language
+    debug: true,
+    keySeparator: false,
+    interpolation: {
+      escapeValue: false,
+    }
+  })
+
+export default i18n;
+```
+
+### Configuration Options Explained
+
+<AccordionGroup>
+  <Accordion title="resources">
+    Object containing all available languages and their translation files.
+  </Accordion>
+  
+  <Accordion title="lng">
+    The default language when the app loads. Currently set to `'es'` (Spanish).
+  </Accordion>
+  
+  <Accordion title="debug">
+    When `true`, logs helpful information to the console during development.
+  </Accordion>
+  
+  <Accordion title="keySeparator">
+    Set to `false` because we use dot notation in our keys (e.g., `"hero.title"`).
+  </Accordion>
+  
+  <Accordion title="interpolation.escapeValue">
+    Set to `false` because React already escapes values to prevent XSS attacks.
+  </Accordion>
+</AccordionGroup>
+
+## Using the useTranslation Hook
+
+The `useTranslation` hook is used throughout the codebase to access translations.
+
+### Basic Usage
+
+```jsx
+import { useTranslation } from "react-i18next"
+
+function MyComponent() {
+  const { t } = useTranslation()
+  
+  return (
+    <div>
+      <h1>{t("hero.title")}</h1>
+      <p>{t("hero.description")}</p>
+    </div>
+  )
+}
+```
+
+### Retrieving Arrays and Objects
+
+When your translation key contains an array or object, use `returnObjects: true`:
+
+```jsx Hero.jsx
+import { useTranslation } from "react-i18next"
+
+function Hero() {
+  const { t } = useTranslation()
+  const highlights = t("hero.highlights", { returnObjects: true })
+
+  return (
+    <ul>
+      {Array.isArray(highlights) &&
+        highlights.map((item, index) => (
+          <li key={`hero-highlight-${index}`}>
+            <p>{item?.value}</p>
+            <p>{item?.label}</p>
+          </li>
+        ))}
+    </ul>
+  )
+}
+```
+
+<Warning>
+  Always check if the result is an array using `Array.isArray()` before mapping to prevent runtime errors.
+</Warning>
+
+### Language-Specific Logic
+
+Sometimes you need different behavior based on the current language:
+
+```jsx Project.jsx
+import { useTranslation } from "react-i18next"
+
+function Project({ project }) {
+  const { t, i18n } = useTranslation()
+
+  const description =
+    i18n.language === "es"
+      ? project?.descriptionSpanish ?? project?.description ?? ""
+      : project?.descriptionEnglish ?? project?.description ?? ""
+
+  return <p>{description}</p>
+}
+```
+
+This pattern is used in the Project component to display the correct description based on the selected language.
+
+## Changing Languages
+
+The language switcher in the Header component demonstrates how to toggle between languages:
+
+```jsx Header.jsx
+import { useTranslation } from "react-i18next"
+import { useState } from "react"
+
+function Header() {
+  const { t, i18n } = useTranslation()
+
+  const toggleLanguage = () => {
+    const nextLanguage = i18n.language === "es" ? "en" : "es"
+    i18n.changeLanguage(nextLanguage)
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={toggleLanguage}
+      className="rounded-full border border-slate-700 bg-slate-900/70 px-3 py-1"
+    >
+      {t("changeLanguage")}
+    </button>
+  )
+}
+```
+
+The `changeLanguage` text itself is also translatable:
+
+```json
+// en.json
+"changeLanguage": "ES / EN"
+
+// es.json  
+"changeLanguage": "EN / ES"
+```
+
+## Adding a New Language
+
+Follow these steps to add a new language (e.g., French):
+
+<Steps>
+  <Step title="Create the translation file">
+    Create a new file `fr.json` in `src/components/dictionaries/`:
+    
+    ```json fr.json
+    {
+      "header.home": "Accueil",
+      "header.about": "À propos",
+      "header.technology": "Compétences",
+      "header.works": "Expérience",
+      "header.projects": "Projets",
+      "header.contact": "Contact",
+      "hero.tagline": "Développeur logiciel",
+      "hero.title": "Je transforme les idées en logiciels qui fonctionnent vraiment",
+      "hero.description": "Je conçois, développe et maintiens des produits numériques..."
+    }
+    ```
+  </Step>
+  
+  <Step title="Import and register the language">
+    Update `src/i18n.js` to include the new language:
+    
+    ```javascript i18n.js
+    import i18n from 'i18next';
+    import { initReactI18next } from 'react-i18next';
+    
+    import translationES from './components/dictionaries/es.json'
+    import translationEN from './components/dictionaries/en.json'
+    import translationFR from './components/dictionaries/fr.json'  // Add this
+    
+    const resources = {
+      es: {
+        translation: translationES
+      },
+      en: {
+        translation: translationEN
+      },
+      fr: {  // Add this
+        translation: translationFR
+      }
+    }
+    
+    i18n
+      .use(initReactI18next)
+      .init({
+        resources,
+        lng: 'es',
+        // ... rest of config
+      })
+    ```
+  </Step>
+  
+  <Step title="Update the language switcher">
+    Modify the language toggle logic to support more than two languages:
+    
+    ```jsx Header.jsx
+    const toggleLanguage = () => {
+      const languages = ['es', 'en', 'fr']
+      const currentIndex = languages.indexOf(i18n.language)
+      const nextIndex = (currentIndex + 1) % languages.length
+      i18n.changeLanguage(languages[nextIndex])
+    }
+    ```
+  </Step>
+  
+  <Step title="Update the language button text">
+    ```json
+    // en.json
+    "changeLanguage": "ES / FR"
+    
+    // es.json
+    "changeLanguage": "EN / FR"
+    
+    // fr.json
+    "changeLanguage": "EN / ES"
+    ```
+  </Step>
+</Steps>
+
+<Tip>
+  Copy one of the existing language files (like `en.json`) and use it as a template to ensure you don't miss any keys.
+</Tip>
+
+## Adding New Translation Keys
+
+When you need to add new content to your portfolio:
+
+<Steps>
+  <Step title="Choose a semantic key name">
+    Use dot notation to organize keys logically:
+    - `section.subsection.property`
+    - Example: `testimonials.title` or `certifications.items`
+  </Step>
+  
+  <Step title="Add the key to ALL language files">
+    ```json en.json
+    {
+      "testimonials.title": "What people say",
+      "testimonials.subtitle": "Testimonials"
+    }
+    ```
+    
+    ```json es.json
+    {
+      "testimonials.title": "Lo que dicen sobre mí",
+      "testimonials.subtitle": "Testimonios"
+    }
+    ```
+  </Step>
+  
+  <Step title="Use the translation in your component">
+    ```jsx
+    import { useTranslation } from "react-i18next"
+    
+    function Testimonials() {
+      const { t } = useTranslation()
+      
+      return (
+        <section>
+          <span>{t("testimonials.subtitle")}</span>
+          <h2>{t("testimonials.title")}</h2>
+        </section>
+      )
+    }
+    ```
+  </Step>
+</Steps>
+
+## Complex Data Structures
+
+The translation system supports nested objects and arrays.
+
+### Arrays of Strings
+
+```json
+"about.description": [
+  "Hi! I'm Federico Moretto — a developer passionate about...",
+  "At Asince SRL, I combine incident response with product development...",
+  "My time working in foreign trade strengthened my analytical thinking..."
+]
+```
+
+Usage:
+```jsx
+const description = t("about.description", { returnObjects: true })
+
+{Array.isArray(description) &&
+  description.map((paragraph, index) => (
+    <p key={`about-paragraph-${index}`}>{paragraph}</p>
+  ))}
+```
+
+### Arrays of Objects
+
+```json
+"skills.groups": [
+  {
+    "title": "Front-end",
+    "items": ["HTML", "CSS", "JavaScript", "TypeScript", "React"]
+  },
+  {
+    "title": "Back-end",
+    "items": ["C# .NET", "Java", "Python", "Node.js"]
+  }
+]
+```
+
+Usage:
+```jsx Skills.jsx
+const groups = t("skills.groups", { returnObjects: true })
+
+{Array.isArray(groups) &&
+  groups.map((group, index) => (
+    <div key={`skills-group-${index}`}>
+      <h3>{group?.title}</h3>
+      <ul>
+        {Array.isArray(group?.items) &&
+          group.items.map((item, itemIndex) => (
+            <li key={`skills-${index}-${itemIndex}`}>
+              {item}
+            </li>
+          ))}
+      </ul>
+    </div>
+  ))}
+```
+
+### Deeply Nested Objects
+
+```json
+"works.items": [
+  {
+    "role": "Technical Support & Software Developer",
+    "company": "Asince SRL",
+    "period": "2022 — Present",
+    "summary": "I keep the company's core platform stable...",
+    "achievements": [
+      "Handled and resolved technical support tickets.",
+      "Developed and implemented hotfixes for production environments."
+    ],
+    "technologies": ["C# .NET", "Vue", "TypeScript", "Azure"]
+  }
+]
+```
+
+## Translation Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Maintain key consistency" icon="check-double">
+    Every language file must have the exact same keys, even if some values are similar across languages.
+  </Card>
+  
+  <Card title="Use semantic naming" icon="tag">
+    Name keys based on their purpose, not their content. Use `hero.callToAction` instead of `hero.button1`.
+  </Card>
+  
+  <Card title="Keep similar lengths" icon="ruler">
+    Try to keep translations roughly the same length to avoid layout issues.
+  </Card>
+  
+  <Card title="Test all languages" icon="globe">
+    Switch between languages regularly during development to catch missing or incorrect translations.
+  </Card>
+  
+  <Card title="Use pluralization sparingly" icon="list-ol">
+    If you need complex pluralization, consider using i18next's pluralization features.
+  </Card>
+  
+  <Card title="Avoid hardcoded text" icon="ban">
+    All user-facing text should go through the translation system, even if you only support one language.
+  </Card>
+</CardGroup>
+
+## Common Patterns
+
+### Conditional Content
+
+```jsx
+const works = t("works.items", { returnObjects: true })
+
+{Array.isArray(works) &&
+  works.map((work, index) => (
+    <article key={`work-${index}`}>
+      {work?.summary && <p>{work.summary}</p>}
+      {Array.isArray(work?.achievements) && work.achievements.length > 0 && (
+        <ul>
+          {work.achievements.map((achievement, i) => (
+            <li key={i}>{achievement}</li>
+          ))}
+        </ul>
+      )}
+    </article>
+  ))}
+```
+
+### Fallback Values
+
+```jsx
+const description =
+  i18n.language === "es"
+    ? project?.descriptionSpanish ?? project?.description ?? ""
+    : project?.descriptionEnglish ?? project?.description ?? ""
+```
+
+### Dynamic Keys
+
+```jsx
+const typeLabels = {
+  sitioWeb: t("projects.typeLabels.website"),
+  varios: t("projects.typeLabels.misc"),
+}
+
+const displayType = typeLabels[project?.type] || project?.type
+```
+
+## Debugging Translations
+
+<Steps>
+  <Step title="Check the console">
+    With `debug: true` in `i18n.js`, missing translations will be logged to the console.
+  </Step>
+  
+  <Step title="Verify key names">
+    Make sure the key you're using in your component exactly matches the key in the JSON file (including dots).
+  </Step>
+  
+  <Step title="Check returnObjects">
+    If you're accessing an array or object, make sure you're using `{ returnObjects: true }`.
+  </Step>
+  
+  <Step title="Validate JSON syntax">
+    Use a JSON validator to ensure your translation files are properly formatted.
+  </Step>
+</Steps>
+
+## Default Language
+
+To change the default language, update the `lng` property in `i18n.js`:
+
+```javascript i18n.js
+i18n
+  .use(initReactI18next)
+  .init({
+    resources,
+    lng: 'en',  // Changed from 'es' to 'en'
+    // ...
+  })
+```
+
+## Persisting Language Preference
+
+Currently, the selected language is not persisted. To save the user's preference:
+
+```javascript
+// In Header.jsx or i18n.js
+const toggleLanguage = () => {
+  const nextLanguage = i18n.language === "es" ? "en" : "es"
+  i18n.changeLanguage(nextLanguage)
+  localStorage.setItem('preferredLanguage', nextLanguage)  // Save preference
+}
+
+// In i18n.js initialization
+const savedLanguage = localStorage.getItem('preferredLanguage')
+
+i18n.init({
+  resources,
+  lng: savedLanguage || 'es',  // Use saved language or default
+  // ...
+})
+```
+
+## Translation Resources
+
+<CardGroup cols={2}>
+  <Card title="react-i18next Documentation" icon="book" href="https://react.i18next.com/">
+    Official documentation for the react-i18next library
+  </Card>
+  
+  <Card title="i18next Documentation" icon="language" href="https://www.i18next.com/">
+    Core i18next library documentation with advanced features
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<Card title="Styling Customization" icon="palette" href="/customization/styling">
+  Learn how to customize the visual appearance with Tailwind CSS
+</Card>

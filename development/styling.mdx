@@ -1,0 +1,420 @@
+---
+title: Styling Guide
+description: Learn how to style components using Tailwind CSS, PostCSS, and custom CSS in Portfolio Moretto
+---
+
+## Overview
+
+Portfolio Moretto uses a modern styling stack combining Tailwind CSS for utility-first styling, PostCSS for processing, and custom CSS for global styles and design tokens.
+
+## Tailwind CSS Setup
+
+Tailwind CSS is configured to scan all relevant files for class names and generate only the CSS you use.
+
+### Configuration
+
+The `tailwind.config.js` file defines what files to scan and theme customizations:
+
+```javascript tailwind.config.js
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+```
+
+### Configuration Breakdown
+
+<Steps>
+  <Step title="Content Paths">
+    The `content` array tells Tailwind where to look for class names:
+    - `./index.html` - Scans the HTML entry point
+    - `./src/**/*.{js,ts,jsx,tsx}` - Scans all JavaScript/TypeScript files in src/
+    
+    <Note>
+      Only classes found in these files will be included in the final CSS bundle, keeping your stylesheet minimal.
+    </Note>
+  </Step>
+
+  <Step title="Theme Extension">
+    The `theme.extend` object is currently empty but can be used to add custom:
+    - Colors
+    - Spacing scales
+    - Breakpoints
+    - Typography settings
+    - And more...
+  </Step>
+
+  <Step title="Plugins">
+    No Tailwind plugins are currently installed, but you can add:
+    - `@tailwindcss/forms` - Better form styling
+    - `@tailwindcss/typography` - Prose styling
+    - `@tailwindcss/aspect-ratio` - Aspect ratio utilities
+  </Step>
+</Steps>
+
+## PostCSS Configuration
+
+PostCSS processes your CSS with Tailwind and Autoprefixer. Configuration is in `postcss.config.js`:
+
+```javascript postcss.config.js
+export default {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}
+```
+
+### What Each Plugin Does
+
+<CardGroup cols={2}>
+  <Card title="Tailwind CSS" icon="wind">
+    Processes `@tailwind` directives and generates utility classes based on your configuration
+  </Card>
+  <Card title="Autoprefixer" icon="browser">
+    Automatically adds vendor prefixes to CSS rules for better browser compatibility
+  </Card>
+</CardGroup>
+
+<Tip>
+  PostCSS runs automatically during development and build through Vite, so you don't need to configure anything else.
+</Tip>
+
+## Global Styles
+
+The `src/index.css` file contains global styles and Tailwind directives:
+
+```css src/index.css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-slate-950 text-slate-100 antialiased;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  a {
+    @apply transition-colors duration-200;
+  }
+}
+```
+
+### Understanding the Structure
+
+<AccordionGroup>
+  <Accordion title="Tailwind Directives">
+    The three `@tailwind` directives inject Tailwind's styles:
+    
+    - **@tailwind base** - Reset styles and base element styling
+    - **@tailwind components** - Component classes (you can define custom ones)
+    - **@tailwind utilities** - All utility classes like `flex`, `pt-4`, etc.
+  </Accordion>
+
+  <Accordion title="@layer base">
+    Custom base styles wrapped in `@layer base` get the same specificity as Tailwind's base styles:
+    
+    - **:root** - Sets color scheme to dark mode
+    - **body** - Applies dark theme colors and typography
+    - **a** - Adds smooth color transitions to all links
+  </Accordion>
+</AccordionGroup>
+
+## Design Tokens & Theme
+
+The project uses a dark theme with Tailwind's slate color palette as the foundation.
+
+### Color Scheme
+
+```css
+:root {
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-slate-950 text-slate-100 antialiased;
+}
+```
+
+<CardGroup cols={2}>
+  <Card title="Background" icon="square">
+    `bg-slate-950` - Very dark slate for the main background
+  </Card>
+  <Card title="Text" icon="font">
+    `text-slate-100` - Light slate for readable text contrast
+  </Card>
+</CardGroup>
+
+### Typography
+
+The project uses a system font stack with Inter as the preferred font:
+
+```css
+font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+```
+
+**Font Stack Priority:**
+1. **Inter** - Modern, highly readable sans-serif (if loaded)
+2. **system-ui** - System's default UI font
+3. **-apple-system** - macOS San Francisco
+4. **BlinkMacSystemFont** - macOS/iOS system font
+5. **Segoe UI** - Windows system font
+6. **sans-serif** - Generic fallback
+
+<Note>
+  The `antialiased` utility applies `-webkit-font-smoothing: antialiased` for smoother font rendering on macOS.
+</Note>
+
+### Transitions
+
+All links have smooth color transitions:
+
+```css
+a {
+  @apply transition-colors duration-200;
+}
+```
+
+This provides a 200ms transition when link colors change on hover or focus.
+
+## Responsive Design Patterns
+
+Tailwind provides responsive utilities using mobile-first breakpoints:
+
+### Breakpoints
+
+| Prefix | Min Width | Description |
+|--------|-----------|-------------|
+| `sm:` | 640px | Small devices |
+| `md:` | 768px | Tablets |
+| `lg:` | 1024px | Laptops |
+| `xl:` | 1280px | Desktops |
+| `2xl:` | 1536px | Large screens |
+
+### Example Usage
+
+```jsx
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  {/* Responsive grid: 1 column on mobile, 2 on tablet, 3 on desktop */}
+</div>
+
+<h1 className="text-2xl md:text-4xl lg:text-6xl font-bold">
+  {/* Responsive typography: grows with screen size */}
+</h1>
+
+<aside className="hidden lg:block">
+  {/* Only visible on large screens and above */}
+</aside>
+```
+
+## Custom Styles with SCSS
+
+While Tailwind handles most styling, Sass is available for complex component styles:
+
+### Available in Dependencies
+
+```json package.json
+{
+  "dependencies": {
+    "sass": "^1.66.1"
+  }
+}
+```
+
+### Creating SCSS Files
+
+Create `.scss` files in your component directories:
+
+```scss src/components/Example/Example.module.scss
+.container {
+  // Complex nested styles
+  .header {
+    // Sass variables
+    $spacing: 1rem;
+    padding: $spacing;
+    
+    // Nesting
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+  
+  // Mixins, functions, etc.
+}
+```
+
+Import in your component:
+
+```jsx
+import styles from './Example.module.scss'
+
+function Example() {
+  return <div className={styles.container}>...</div>
+}
+```
+
+<Tip>
+  Use CSS Modules (`.module.scss`) to scope styles locally and avoid naming conflicts.
+</Tip>
+
+## Styling Best Practices
+
+<Steps>
+  <Step title="Prefer Tailwind utilities">
+    Use Tailwind classes for most styling needs. They're optimized, consistent, and easy to maintain.
+    
+    ```jsx
+    // Good
+    <button className="px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded">
+      Click me
+    </button>
+    
+    // Avoid unless necessary
+    <button style={{ padding: '0.5rem 1rem', backgroundColor: '#3b82f6' }}>
+      Click me
+    </button>
+    ```
+  </Step>
+
+  <Step title="Use @apply for repeated patterns">
+    When you have complex repeated utility combinations, extract them with `@apply`:
+    
+    ```css
+    @layer components {
+      .btn-primary {
+        @apply px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded transition-colors;
+      }
+    }
+    ```
+  </Step>
+
+  <Step title="Keep specificity low">
+    Avoid deeply nested selectors. Tailwind's utility-first approach naturally keeps specificity flat.
+  </Step>
+
+  <Step title="Use Sass for complex component logic">
+    Reserve SCSS for components with complex styling logic that would be verbose in Tailwind:
+    - Complex animations
+    - Deeply nested structures
+    - Mathematical calculations
+    - Mixins and functions
+  </Step>
+</Steps>
+
+## Dark Mode Support
+
+The project is configured for dark mode by default. To add light mode support:
+
+### Enable Dark Mode in Tailwind
+
+```javascript tailwind.config.js
+export default {
+  darkMode: 'class', // or 'media' for system preference
+  // ... rest of config
+}
+```
+
+### Use Dark Mode Utilities
+
+```jsx
+<div className="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+  {/* Styles adapt to light/dark mode */}
+</div>
+```
+
+### Toggle Dark Mode
+
+Add a class to the HTML element:
+
+```javascript
+// Toggle dark mode
+document.documentElement.classList.toggle('dark')
+```
+
+<Warning>
+  Currently the project uses `color-scheme: dark` in CSS, which locks it to dark mode. Remove this if implementing a theme toggle.
+</Warning>
+
+## Custom Tailwind Utilities
+
+Extend Tailwind with custom utilities in your config:
+
+```javascript tailwind.config.js
+export default {
+  theme: {
+    extend: {
+      colors: {
+        'brand-blue': '#1e40af',
+        'brand-gray': '#334155',
+      },
+      spacing: {
+        '128': '32rem',
+        '144': '36rem',
+      },
+      fontFamily: {
+        'display': ['Inter', 'system-ui', 'sans-serif'],
+      },
+    },
+  },
+}
+```
+
+Then use them like any Tailwind utility:
+
+```jsx
+<div className="bg-brand-blue text-brand-gray font-display p-128">
+  Custom styled content
+</div>
+```
+
+## Debugging Styles
+
+### Visual Debugging
+
+Add borders to see element boundaries:
+
+```jsx
+<div className="border-2 border-red-500">
+  {/* Temporarily add to debug layout */}
+</div>
+```
+
+### Tailwind CSS IntelliSense
+
+Install the VS Code extension for autocomplete and class name validation:
+- Hover to see generated CSS
+- Autocomplete for all utilities
+- Linting for invalid classes
+
+### Browser DevTools
+
+Inspect elements to see which Tailwind classes are applied and their generated CSS.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Firebase Integration" icon="fire" href="/development/firebase">
+    Learn how to integrate Firebase for data and storage
+  </Card>
+  <Card title="Component Guide" icon="cube" href="/components/header">
+    Explore the component architecture
+  </Card>
+  <Card title="Tailwind Docs" icon="link" href="https://tailwindcss.com/docs">
+    Official Tailwind CSS documentation
+  </Card>
+  <Card title="PostCSS Docs" icon="link" href="https://postcss.org/">
+    Learn more about PostCSS
+  </Card>
+</CardGroup>

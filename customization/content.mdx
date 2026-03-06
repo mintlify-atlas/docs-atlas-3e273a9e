@@ -1,0 +1,500 @@
+---
+title: Content Customization
+description: Learn how to customize the content throughout your Portfolio Moretto site, including personal information, skills, experience, and project data.
+icon: 'file-text'
+---
+
+## Overview
+
+Portfolio Moretto uses a translation-based content system that makes it easy to update your personal information, skills, work experience, and other content throughout the site. All content is managed through JSON dictionary files and Firebase for dynamic project data.
+
+<Tip>
+  The portfolio supports multilingual content out of the box. Any content changes you make should be reflected in both `en.json` and `es.json` files.
+</Tip>
+
+## Translation Files Location
+
+All static content is stored in translation dictionary files:
+
+```bash
+source/src/components/dictionaries/
+├── en.json  # English translations
+└── es.json  # Spanish translations
+```
+
+## Hero Section
+
+The hero section is the first thing visitors see. Update it by editing the `hero.*` keys in your translation files.
+
+### Hero Content Keys
+
+<AccordionGroup>
+  <Accordion title="hero.tagline">
+    The small badge text that appears above your main title.
+    
+    ```json
+    "hero.tagline": "Software Developer"
+    ```
+  </Accordion>
+
+  <Accordion title="hero.title">
+    Your main headline - make it impactful!
+    
+    ```json
+    "hero.title": "I turn ideas into software that truly works"
+    ```
+  </Accordion>
+
+  <Accordion title="hero.description">
+    Primary description of what you do.
+    
+    ```json
+    "hero.description": "I design, build, and maintain digital products that blend simple interfaces with solid, long-lasting architecture."
+    ```
+  </Accordion>
+
+  <Accordion title="hero.secondary">
+    Additional context about your current role or focus.
+    
+    ```json
+    "hero.secondary": "I'm currently part of Asince SRL, where I focus on keeping critical systems stable while building new features that help the company grow."
+    ```
+  </Accordion>
+</AccordionGroup>
+
+### Hero Highlights
+
+The hero section includes statistical highlights. These are defined as an array of objects:
+
+```json
+"hero.highlights": [
+  { "label": "Years in tech", "value": "2+" },
+  { "label": "Projects delivered", "value": "5+" },
+  { "label": "Based in", "value": "Argentina" }
+]
+```
+
+### How It's Used in Components
+
+The Hero component (`src/components/Main/Hero.jsx`) retrieves this content using the `useTranslation` hook:
+
+```jsx Hero.jsx
+import { useTranslation } from "react-i18next"
+
+function Hero() {
+  const { t } = useTranslation()
+  const highlights = t("hero.highlights", { returnObjects: true })
+
+  return (
+    <section id="hero" className="scroll-mt-32 px-6">
+      <h1 className="text-4xl font-semibold text-white sm:text-5xl lg:text-6xl">
+        {t("hero.title")}
+      </h1>
+      <p className="max-w-2xl text-lg leading-relaxed text-slate-200">
+        {t("hero.description")}
+      </p>
+      {/* ... */}
+    </section>
+  )
+}
+```
+
+<Note>
+  Use `returnObjects: true` when retrieving arrays or objects from translation files.
+</Note>
+
+## About Section
+
+Update your personal story and background through the `about.*` keys.
+
+### About Content Structure
+
+```json
+"about.subtitle": "Story",
+"about.title": "From tech support to full-stack developer",
+"about.description": [
+  "Hi! I'm Federico Moretto — a developer passionate about turning complex ideas into clear, scalable, and maintainable solutions.",
+  "At Asince SRL, I combine incident response with product development: I analyze tickets, apply hotfixes, and ship new features while keeping performance in check.",
+  "My time working in foreign trade strengthened my analytical thinking and my ability to collaborate with people from different areas."
+]
+```
+
+<Steps>
+  <Step title="Edit the about.description array">
+    Each string in the array becomes a separate paragraph. Add or remove strings to adjust the length of your story.
+  </Step>
+  
+  <Step title="Update about.highlights">
+    Showcase what your team trusts you to do:
+    
+    ```json
+    "about.highlights": [
+      "Identify and resolve production issues before they affect users.",
+      "Design automations that reduce manual work and speed up support processes.",
+      "Improve user interfaces while respecting accessibility and visual consistency.",
+      "Monitor infrastructure and performance across cloud services and databases."
+    ]
+    ```
+  </Step>
+  
+  <Step title="Update about.focusAreas">
+    List technologies or areas you're currently exploring:
+    
+    ```json
+    "about.focusAreas": [
+      "AI-powered tools to speed up debugging and support workflows.",
+      "Design systems that keep multilingual products consistent.",
+      "Cloud-native observability and incident response strategies.",
+      "Scalable APIs with .NET and serverless deployments."
+    ]
+    ```
+  </Step>
+</Steps>
+
+### Updating Your Profile Photo
+
+The About component imports a profile image directly:
+
+```jsx About.jsx
+import fede from "../../assets/Foto.jpeg"
+
+// Later in the component:
+<img
+  src={fede}
+  alt="Federico Moretto portrait"
+  className="relative z-10 h-auto w-full max-w-sm rounded-3xl"
+/>
+```
+
+To change your photo:
+1. Replace `src/assets/Foto.jpeg` with your own image
+2. Or update the import path to point to your new image file
+
+## Skills Section
+
+The skills section showcases your technical expertise grouped by category.
+
+### Skills Structure
+
+```json
+"skills.subtitle": "Toolkit",
+"skills.title": "Skills & technologies",
+"skills.description": "Passionate about backend development — turning logic and data into stable, secure, and efficient solutions.",
+"skills.groups": [
+  {
+    "title": "Front-end",
+    "items": ["HTML", "CSS", "JavaScript", "TypeScript", "Tailwind CSS", "React", "Next.js", "React Native"]
+  },
+  {
+    "title": "Back-end",
+    "items": ["C# .NET", "Java", "Spring Boot", "Python", "Node.js"]
+  },
+  {
+    "title": "Tools",
+    "items": ["SQL", "Firebase", "Git", "GitHub", "Azure", "Jira"]
+  }
+]
+```
+
+### Adding or Removing Skills
+
+<CodeGroup>
+```json Add a new skill group
+"skills.groups": [
+  {
+    "title": "Front-end",
+    "items": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "DevOps",
+    "items": ["Docker", "Kubernetes", "GitHub Actions", "Terraform"]
+  }
+]
+```
+
+```json Add skills to existing group
+{
+  "title": "Back-end",
+  "items": ["C# .NET", "Java", "Spring Boot", "Python", "Node.js", "Go", "Rust"]
+}
+```
+</CodeGroup>
+
+### Skills Highlights
+
+Add professional highlights that demonstrate your expertise:
+
+```json
+"skills.highlights": [
+  "Set up CI/CD pipelines and automated testing to ensure reliable releases.",
+  "Encourage component-driven development with reusable patterns and accessibility in mind.",
+  "Collaborate closely with business teams to turn rules into maintainable features."
+]
+```
+
+## Work Experience
+
+Update your professional experience through the `works.items` array.
+
+### Experience Item Structure
+
+```json
+"works.items": [
+  {
+    "role": "Technical Support & Software Developer",
+    "company": "Asince SRL",
+    "period": "2022 — Present",
+    "summary": "I keep the company's core platform stable while developing new features for fintech and ERP products.",
+    "achievements": [
+      "Handled and resolved technical support tickets.",
+      "Developed and implemented hotfixes for production environments.",
+      "Monitored and maintained servers and databases.",
+      "Developed new features for web applications."
+    ],
+    "technologies": ["C# .NET", "Vue", "TypeScript", "Azure", "Oracle SQL", "Crystal Reports"]
+  }
+]
+```
+
+### Adding New Work Experience
+
+<Steps>
+  <Step title="Copy an existing work item">
+    Duplicate one of the objects in the `works.items` array.
+  </Step>
+  
+  <Step title="Update all fields">
+    - **role**: Your job title
+    - **company**: Company name
+    - **period**: Time period (e.g., "2022 — Present")
+    - **summary**: One-sentence overview of your role
+    - **achievements**: Array of bullet points describing your accomplishments
+    - **technologies**: Array of technologies you used
+  </Step>
+  
+  <Step title="Maintain chronological order">
+    Place newer positions first in the array (reverse chronological order).
+  </Step>
+</Steps>
+
+## Projects (Firebase)
+
+Unlike static content, projects are stored in Firebase Firestore for dynamic management.
+
+### Project Document Structure
+
+Each project in Firebase has the following structure:
+
+```javascript
+{
+  title: "To Do List",
+  description: "Task management application",
+  descriptionEnglish: "Developed a task list application...",
+  descriptionSpanish: "Desarrollé una aplicación de lista de tareas...",
+  type: "varios",  // or "sitioWeb"
+  img: "https://storage.googleapis.com/...",
+  imageUrl: "https://storage.googleapis.com/...",
+  githubLink: "https://github.com/fedemoretto11/To-Do-List",
+  webLink: "https://fedemoretto11.github.io/To-Do-List/",
+  techs: ["JavaScript", "HTML", "CSS"],
+  isFinished: true,
+  visible: true,
+  role: "Solo Developer"  // Optional
+}
+```
+
+### Adding Projects to Firebase
+
+<Note>
+  You'll need Firebase credentials configured in your `.env` file to manage projects.
+</Note>
+
+The project helper function (`src/components/db/data.js`) shows how to add projects:
+
+```javascript data.js
+import { addDoc, collection, getFirestore } from 'firebase/firestore'
+import { db } from '../db/data'
+
+let proyecto = {
+  title: "To Do List",
+  description: "Desarrollé una aplicación de lista de tareas...",
+  type: "varios",
+  img: imageURL,
+  githubLink: "https://github.com/fedemoretto11/To-Do-List",
+  webLink: "https://fedemoretto11.github.io/To-Do-List/"
+}
+
+addDoc(collection(db, "projects"), proyecto)
+  .then((res) => {
+    console.log(res, "Document uploaded successfully")
+  })
+  .catch((err) => {
+    console.error(err, "Error uploading document")
+  })
+```
+
+### Project Types
+
+Projects can be filtered by type:
+- `"sitioWeb"` - Website projects
+- `"varios"` - Miscellaneous projects
+- `"todos"` - Shows all projects
+
+The translation keys for these labels:
+
+```json
+"projects.typeLabels.website": "Website",
+"projects.typeLabels.misc": "Other"
+```
+
+### Project Visibility
+
+Control whether a project appears in the portfolio:
+
+```javascript
+{
+  visible: true,  // Project will be displayed
+  isFinished: false  // Shows "In development" badge
+}
+```
+
+## Contact Information
+
+Update your contact section content and links.
+
+### Contact Content
+
+```json
+"contact.subtitle": "Collaboration",
+"contact.title": "Let's build something meaningful",
+"contact.description": [
+  "I'm open to new opportunities, remote projects, and conversations about software and product growth.",
+  "Prefer async? Send me an email or grab my latest resume."
+]
+```
+
+### Contact Links
+
+Update the actual email and resume links in `Contact.jsx`:
+
+```jsx Contact.jsx
+<a
+  href="mailto:fedemoretto94@gmail.com"  // Update this
+  className="inline-flex items-center justify-center gap-2..."
+>
+  <i className="bi bi-envelope-paper-heart" />
+  {t("contact.ctaEmail")}
+</a>
+<a
+  href="https://drive.google.com/file/d/YOUR-RESUME-ID"  // Update this
+  target="_blank"
+  rel="noopener noreferrer"
+  className="inline-flex items-center justify-center gap-2..."
+>
+  <i className="bi bi-file-earmark-arrow-down" />
+  {t("contact.ctaResume")}
+</a>
+```
+
+## Header & Navigation
+
+Update navigation labels in the translation files:
+
+```json
+"header.home": "Home",
+"header.about": "About",
+"header.technology": "Skills",
+"header.works": "Experience",
+"header.projects": "Projects",
+"header.contact": "Contact"
+```
+
+The navigation structure is defined in `Header.jsx`:
+
+```jsx Header.jsx
+const navLinks = [
+  { id: "home", label: t("header.home"), href: "#hero" },
+  { id: "about", label: t("header.about"), href: "#about" },
+  { id: "works", label: t("header.works"), href: "#works" },
+  { id: "tech", label: t("header.technology"), href: "#tech" },
+  { id: "projects", label: t("header.projects"), href: "#projects" },
+  { id: "contact", label: t("header.contact"), href: "#contact" },
+]
+```
+
+## Footer
+
+Update footer text:
+
+```json
+"footer.develop": "Developed by Federico Moretto",
+"footer.rights": "All rights reserved"
+```
+
+## Translation Key Reference
+
+<Tip>
+  When adding new translation keys, make sure they exist in **both** `en.json` and `es.json` to avoid missing translations.
+</Tip>
+
+### Key Naming Convention
+
+Translation keys follow this pattern:
+```
+[section].[subsection].[property]
+```
+
+Examples:
+- `hero.title` - Hero section title
+- `about.highlights` - About section highlights array  
+- `projects.links.demo` - Project demo link text
+- `skills.groups` - Skills groups array
+
+### Using Translation Keys in Components
+
+```jsx
+import { useTranslation } from "react-i18next"
+
+function MyComponent() {
+  const { t } = useTranslation()
+  
+  // Simple string
+  const title = t("section.title")
+  
+  // Array or object (requires returnObjects)
+  const items = t("section.items", { returnObjects: true })
+  
+  return (
+    <div>
+      <h1>{title}</h1>
+      {items.map(item => <p key={item}>{item}</p>)}
+    </div>
+  )
+}
+```
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Keep it consistent" icon="check">
+    Ensure both language files have matching keys and similar content length.
+  </Card>
+  
+  <Card title="Test both languages" icon="language">
+    Switch between languages to verify all content displays correctly.
+  </Card>
+  
+  <Card title="Use semantic keys" icon="tag">
+    Name translation keys based on their purpose, not their content.
+  </Card>
+  
+  <Card title="Backup before editing" icon="floppy-disk">
+    Keep a copy of your translation files before making major changes.
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<Card title="Translations" icon="language" href="/customization/translations">
+  Learn how to add new languages and manage translation files
+</Card>

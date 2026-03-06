@@ -1,0 +1,325 @@
+---
+title: Development Setup
+description: Complete guide to setting up your local development environment for Portfolio Moretto
+---
+
+## Overview
+
+Portfolio Moretto is built with React, Vite, and Tailwind CSS, providing a modern and fast development experience. This guide will walk you through the complete setup process.
+
+## Prerequisites
+
+Before you begin, ensure you have the following installed:
+
+<CardGroup cols={2}>
+  <Card title="Node.js" icon="node">
+    Version 18.x or higher recommended
+  </Card>
+  <Card title="npm" icon="npm">
+    Comes bundled with Node.js
+  </Card>
+</CardGroup>
+
+## Installation
+
+<Steps>
+  <Step title="Clone the repository">
+    Clone the project to your local machine:
+    
+    ```bash
+    git clone <repository-url>
+    cd portfolio-moretto
+    ```
+  </Step>
+
+  <Step title="Install dependencies">
+    Install all required packages using npm:
+    
+    ```bash
+    npm install
+    ```
+    
+    This will install the following key dependencies:
+    - **React 18.2.0** - Core UI library
+    - **Vite 4.4.5** - Build tool and dev server
+    - **Firebase 10.3.1** - Backend services
+    - **Tailwind CSS 3.3.3** - Utility-first CSS framework
+    - **i18next** - Internationalization framework
+    - **Sass 1.66.1** - CSS preprocessor
+  </Step>
+
+  <Step title="Configure environment variables">
+    Create a `.env` file in the root directory with your Firebase credentials:
+    
+    ```bash
+    VITE_apiKey=your_api_key
+    VITE_authDomain=your_auth_domain
+    VITE_projectId=your_project_id
+    VITE_storageBucket=your_storage_bucket
+    VITE_messagingSenderId=your_messaging_sender_id
+    VITE_appId=your_app_id
+    ```
+    
+    <Warning>
+      Never commit your `.env` file to version control. It should already be included in `.gitignore`.
+    </Warning>
+  </Step>
+</Steps>
+
+## Project Structure
+
+Understanding the project structure will help you navigate and contribute effectively:
+
+```
+portfolio-moretto/
+├── public/              # Static assets
+├── src/
+│   ├── components/      # React components
+│   │   ├── db/         # Firebase integration
+│   │   ├── Footer/     # Footer component
+│   │   ├── Header/     # Header component
+│   │   ├── Main/       # Main content sections
+│   │   └── Projects/   # Project showcase components
+│   ├── index.css       # Global styles with Tailwind
+│   ├── i18n.js        # Internationalization setup
+│   ├── main.jsx       # Application entry point
+│   └── App.jsx        # Root component
+├── index.html          # HTML template
+├── vite.config.js      # Vite configuration
+├── tailwind.config.js  # Tailwind CSS configuration
+├── postcss.config.js   # PostCSS configuration
+└── package.json        # Project dependencies
+```
+
+### Key Directories
+
+<AccordionGroup>
+  <Accordion title="src/components/">
+    Contains all React components organized by feature:
+    - **db/** - Firebase database and storage utilities
+    - **Main/** - Core sections (Hero, About, Skills, Contact, etc.)
+    - **Projects/** - Project listing and display components
+    - **Header/** and **Footer/** - Layout components
+    - **dictionaries/** - Translation files for i18next (es.json, en.json)
+  </Accordion>
+
+  <Accordion title="public/">
+    Static assets that are served directly:
+    - Images (favicon, project screenshots)
+    - Other static files
+  </Accordion>
+</AccordionGroup>
+
+## Development Scripts
+
+The project includes several npm scripts defined in `package.json` for common tasks:
+
+### Start Development Server
+
+Run the Vite development server with hot module replacement:
+
+```bash
+npm run dev
+```
+
+The application will be available at `http://localhost:5173` by default. Changes to your code will automatically reload the browser.
+
+<Note>
+  Vite's dev server is extremely fast thanks to native ES modules and esbuild-powered HMR.
+</Note>
+
+### Build for Production
+
+Create an optimized production build:
+
+```bash
+npm run build
+```
+
+This command:
+- Bundles all code with Vite
+- Optimizes assets (minification, tree-shaking)
+- Outputs to the `dist/` directory
+- Generates production-ready static files
+
+### Preview Production Build
+
+Preview the production build locally before deployment:
+
+```bash
+npm run preview
+```
+
+This serves the `dist/` directory to verify the production build works correctly.
+
+### Lint Code
+
+Run ESLint to check for code quality issues:
+
+```bash
+npm run lint
+```
+
+This uses the configuration in `.eslintrc.cjs` to check JavaScript and JSX files.
+
+## Vite Configuration
+
+The project uses a minimal Vite configuration located in `vite.config.js`:
+
+```javascript vite.config.js
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [react()],
+})
+```
+
+This configuration:
+- Enables React Fast Refresh for instant feedback
+- Uses JSX transformation for React components
+- Leverages Vite's default optimizations
+
+<Tip>
+  You can extend this configuration to add path aliases, custom build options, or proxy settings for API requests.
+</Tip>
+
+## Code Quality & Linting
+
+The project uses ESLint with React-specific rules to maintain code quality:
+
+```javascript .eslintrc.cjs
+module.exports = {
+  root: true,
+  env: { browser: true, es2020: true },
+  extends: [
+    'eslint:recommended',
+    'plugin:react/recommended',
+    'plugin:react/jsx-runtime',
+    'plugin:react-hooks/recommended',
+  ],
+  ignorePatterns: ['dist', '.eslintrc.cjs'],
+  parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
+  settings: { react: { version: '18.2' } },
+  plugins: ['react-refresh'],
+  rules: {
+    'react-refresh/only-export-components': [
+      'warn',
+      { allowConstantExport: true },
+    ],
+  },
+}
+```
+
+### ESLint Configuration Breakdown
+
+- **extends**: Uses recommended rulesets for React and hooks
+- **react/jsx-runtime**: Supports new JSX transform (no need to import React)
+- **react-refresh plugin**: Warns about Fast Refresh compatibility issues
+- **Target**: ES2020 features in browser environment
+
+<Warning>
+  The lint script is configured with `--max-warnings 0`, meaning any warnings will cause the lint check to fail.
+</Warning>
+
+## Entry Points
+
+### HTML Entry (`index.html`)
+
+The main HTML file serves as the application shell:
+
+```html index.html
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/sith.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Federico Moretto || Portfolio Personal</title>
+    <meta name="description" content="Bienvenidos al Portfolio Personal de Federico Moretto...">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+```
+
+### JavaScript Entry (`src/main.jsx`)
+
+The main.jsx file bootstraps the React application:
+
+```jsx src/main.jsx
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import './i18n';
+import App from './App.jsx'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <App />
+)
+```
+
+Key aspects:
+- Imports i18n configuration before App
+- Imports global CSS with Tailwind directives
+- Renders App component to the root element
+- React.StrictMode is commented out
+
+## Internationalization
+
+The project supports multiple languages using i18next. Configuration is in `src/i18n.js`:
+
+```javascript src/i18n.js
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+
+import translationES from './components/dictionaries/es.json'
+import translationEN from './components/dictionaries/en.json'
+
+const resources = {
+  es: {
+    translation: translationES
+  },
+  en: {
+    translation: translationEN
+  }
+}
+
+i18n
+  .use(initReactI18next)
+  .init({
+    resources,
+    lng: 'es',
+    debug: true,
+    keySeparator: false,
+    interpolation: {
+      escapeValue: false,
+    }
+  })
+
+export default i18n;
+```
+
+- Default language: Spanish (`es`)
+- Translations stored in `src/components/dictionaries/`
+- Debug mode enabled for development
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Styling Guide" icon="palette" href="/development/styling">
+    Learn about Tailwind CSS setup and custom styling
+  </Card>
+  <Card title="Firebase Integration" icon="fire" href="/development/firebase">
+    Configure Firebase for data storage and images
+  </Card>
+  <Card title="Architecture" icon="sitemap" href="/architecture/overview">
+    Understand the application architecture
+  </Card>
+  <Card title="Customization" icon="palette" href="/customization/content">
+    Customize content and translations
+  </Card>
+</CardGroup>

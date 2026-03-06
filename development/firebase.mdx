@@ -1,0 +1,587 @@
+---
+title: Firebase Integration
+description: Complete guide to setting up and using Firebase for database and storage in Portfolio Moretto
+---
+
+## Overview
+
+Portfolio Moretto uses Firebase to store and manage project data and images. The integration includes Firestore for the database and Firebase Storage for hosting project images.
+
+## Firebase Setup
+
+### Install Firebase SDK
+
+Firebase is already included in the project dependencies:
+
+```json package.json
+{
+  "dependencies": {
+    "firebase": "^10.3.1",
+    "@firebase/storage": "^0.11.2"
+  }
+}
+```
+
+### Environment Variables
+
+Firebase requires several API keys and configuration values. These are stored in environment variables for security.
+
+<Steps>
+  <Step title="Create .env file">
+    Create a `.env` file in the project root:
+    
+    ```bash
+    touch .env
+    ```
+  </Step>
+
+  <Step title="Add Firebase configuration">
+    Add your Firebase project credentials:
+    
+    ```bash .env
+    VITE_apiKey=AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXX
+    VITE_authDomain=your-project.firebaseapp.com
+    VITE_projectId=your-project-id
+    VITE_storageBucket=your-project.appspot.com
+    VITE_messagingSenderId=123456789012
+    VITE_appId=1:123456789012:web:abcdef123456
+    ```
+    
+    <Warning>
+      **Never commit `.env` to version control!** Make sure it's in your `.gitignore` file.
+    </Warning>
+  </Step>
+
+  <Step title="Get Firebase credentials">
+    To get these values:
+    
+    1. Go to [Firebase Console](https://console.firebase.google.com/)
+    2. Select your project (or create a new one)
+    3. Click the gear icon → Project Settings
+    4. Scroll to "Your apps" and select your web app
+    5. Copy the config values to your `.env` file
+    
+    <Note>
+      The `VITE_` prefix is required for Vite to expose these variables to your client code.
+    </Note>
+  </Step>
+</Steps>
+
+## Firebase Configuration
+
+The Firebase SDK is initialized in `src/components/db/data.js`:
+
+```javascript src/components/db/data.js
+import { getStorage, ref, uploadBytes, getDownloadURL } from "@firebase/storage";
+import { initializeApp } from "firebase/app";
+import { addDoc, collection, getFirestore } from 'firebase/firestore'
+
+const firebaseConfig = {
+  apiKey: import.meta.env.VITE_apiKey,
+  authDomain: import.meta.env.VITE_authDomain,
+  projectId: import.meta.env.VITE_projectId,
+  storageBucket: import.meta.env.VITE_storageBucket,
+  messagingSenderId: import.meta.env.VITE_messagingSenderId,
+  appId: import.meta.env.VITE_appId,
+};
+
+const app = initializeApp(firebaseConfig);
+export const db = getFirestore(app)
+export const data = getStorage(app)
+```
+
+### Configuration Breakdown
+
+<AccordionGroup>
+  <Accordion title="Environment Variable Access">
+    Vite exposes environment variables through `import.meta.env`:
+    
+    ```javascript
+    // Access environment variables
+    const apiKey = import.meta.env.VITE_apiKey
+    ```
+    
+    Only variables prefixed with `VITE_` are accessible in client code.
+  </Accordion>
+
+  <Accordion title="Firebase Initialization">
+    The `initializeApp()` function initializes Firebase with your config:
+    
+    ```javascript
+    const app = initializeApp(firebaseConfig);
+    ```
+    
+    This must be called before using any Firebase services.
+  </Accordion>
+
+  <Accordion title="Service Exports">
+    The file exports two Firebase services:
+    
+    - **db** - Firestore database instance
+    - **data** - Firebase Storage instance (named `data` in this project)
+  </Accordion>
+</AccordionGroup>
+
+## Firestore Database
+
+Firestore is used to store project information including titles, descriptions, links, and image URLs.
+
+### Database Structure
+
+Projects are stored in a `projects` collection with the following structure:
+
+```javascript
+{
+  title: "Project Name",
+  description: "Detailed project description",
+  type: "category",
+  img: "https://firebasestorage.googleapis.com/...",
+  githubLink: "https://github.com/...",
+  webLink: "https://example.com"
+}
+```
+
+### Adding Projects to Firestore
+
+The `agergarDocumento` function handles adding new projects:
+
+```javascript src/components/db/data.js
+export async function agergarDocumento(referencia) {
+  let imageURL;
+  let indiviudalImageRef = ref(data, `images/${referencia}.webp`)
+  let url = getDownloadURL(indiviudalImageRef)
+  
+  try {
+    await url.then((res) => {imageURL = res})
+  } catch (error) {
+    console.log(error, "error here")
+  }  
+
+  let proyecto = {
+    title: "To Do List",
+    description: "Desarrollé una aplicación de lista de tareas...",
+    type: "varios",
+    img: imageURL,
+    githubLink: "https://github.com/fedemoretto11/To-Do-List",
+    webLink: "https://fedemoretto11.github.io/To-Do-List/"
+  }
+  
+  // Uncomment to add to Firestore:
+  // addDoc(collection(db, "projects"), proyecto)
+  //   .then((res) => {
+  //     console.log(res, "Docu subido correctamente")
+  //   })
+  //   .catch((err) => {
+  //     console.error(err, "error de carga de documento")
+  //   })
+}
+```
+
+### How It Works
+
+<Steps>
+  <Step title="Get image URL">
+    First, it retrieves the download URL for the project image from Firebase Storage:
+    
+    ```javascript
+    let indiviudalImageRef = ref(data, `images/${referencia}.webp`)
+    let url = getDownloadURL(indiviudalImageRef)
+    ```
+  </Step>
+
+  <Step title="Create project object">
+    Then it creates a project object with all the necessary fields:
+    
+    ```javascript
+    let proyecto = {
+      title: "Project Title",
+      description: "...",
+      type: "category",
+      img: imageURL,
+      githubLink: "...",
+      webLink: "..."
+    }
+    ```
+  </Step>
+
+  <Step title="Add to Firestore">
+    Finally, it adds the document to the `projects` collection:
+    
+    ```javascript
+    addDoc(collection(db, "projects"), proyecto)
+    ```
+    
+    <Note>
+      This code is currently commented out. Uncomment it when you're ready to add projects.
+    </Note>
+  </Step>
+</Steps>
+
+### Using the Function
+
+To add a new project:
+
+```javascript
+import { agergarDocumento } from './components/db/data'
+
+// Add a project (image reference name without .webp extension)
+agergarDocumento("projectImageName")
+```
+
+<Tip>
+  Make sure the image exists in Firebase Storage at `images/projectImageName.webp` before calling this function.
+</Tip>
+
+## Firebase Storage
+
+Firebase Storage is used to host project images in WebP format for optimal performance.
+
+### Storage Structure
+
+```
+storage-bucket/
+└── images/
+    ├── project1.webp
+    ├── project2.webp
+    └── project3.webp
+```
+
+All project images are stored in the `images/` folder with `.webp` extension.
+
+### Uploading Images
+
+The `subirFoto` function handles image uploads:
+
+```javascript src/components/db/data.js
+const metadata = {
+  contentType: 'image/webp' 
+}
+
+export function subirFoto() {
+  fetch('/public/toDoList.webp')
+    .then((response) => response.blob())
+    .then((blob) => {
+      uploadBytes(indiviudalImageRef, blob, metadata)
+        .then((snapshot) => {
+          console.log("uploaded by Fede", snapshot)
+        })
+        .catch((err) => {
+          console.error("not catch", err)
+        })
+    })
+    .catch((err) => {
+      console.error(err, "hay un mistake")
+    })
+}
+```
+
+### Upload Process
+
+<Steps>
+  <Step title="Fetch local image">
+    Fetch the image file from the public directory:
+    
+    ```javascript
+    fetch('/public/toDoList.webp')
+      .then((response) => response.blob())
+    ```
+  </Step>
+
+  <Step title="Create storage reference">
+    Create a reference to where the image will be stored:
+    
+    ```javascript
+    const imageRef = ref(data, 'images/toDoList.webp')
+    ```
+  </Step>
+
+  <Step title="Upload with metadata">
+    Upload the blob with proper metadata:
+    
+    ```javascript
+    const metadata = { contentType: 'image/webp' }
+    uploadBytes(imageRef, blob, metadata)
+    ```
+  </Step>
+</Steps>
+
+### Retrieving Image URLs
+
+To get a download URL for an uploaded image:
+
+```javascript
+import { ref, getDownloadURL } from "@firebase/storage";
+import { data } from './components/db/data'
+
+const imageRef = ref(data, 'images/project.webp')
+
+getDownloadURL(imageRef)
+  .then((url) => {
+    console.log('Image URL:', url)
+    // Use this URL in your img tags
+  })
+  .catch((error) => {
+    console.error('Error getting URL:', error)
+  })
+```
+
+<Note>
+  Download URLs are permanent and can be cached. They include authentication tokens that allow public access to the files.
+</Note>
+
+## Working with Project Data
+
+### Complete Workflow
+
+Here's the complete process for adding a new project:
+
+<Steps>
+  <Step title="Prepare your image">
+    Convert your project screenshot to WebP format:
+    
+    ```bash
+    # Using cwebp (install from webp package)
+    cwebp input.png -o project.webp
+    ```
+    
+    Place it in the `public/` directory temporarily.
+  </Step>
+
+  <Step title="Upload image to Storage">
+    Create and call an upload function:
+    
+    ```javascript
+    import { ref, uploadBytes } from "@firebase/storage";
+    import { data } from './components/db/data'
+    
+    async function uploadProjectImage(fileName) {
+      const response = await fetch(`/public/${fileName}`)
+      const blob = await response.blob()
+      const imageRef = ref(data, `images/${fileName}`)
+      const metadata = { contentType: 'image/webp' }
+      
+      await uploadBytes(imageRef, blob, metadata)
+      console.log('Upload complete!')
+    }
+    
+    uploadProjectImage('project.webp')
+    ```
+  </Step>
+
+  <Step title="Add project to Firestore">
+    Modify the `agergarDocumento` function with your project details:
+    
+    ```javascript
+    let proyecto = {
+      title: "Your Project Title",
+      description: "Your project description in Spanish",
+      type: "web" // or "varios", etc.
+      img: imageURL,
+      githubLink: "https://github.com/username/repo",
+      webLink: "https://your-project.com"
+    }
+    ```
+    
+    Uncomment the `addDoc` call and run the function.
+  </Step>
+
+  <Step title="Verify in Firebase Console">
+    Check the Firebase Console to ensure:
+    - Image appears in Storage → images/
+    - Document appears in Firestore → projects collection
+  </Step>
+</Steps>
+
+## Reading Projects
+
+To fetch and display projects from Firestore:
+
+```javascript
+import { collection, getDocs } from 'firebase/firestore'
+import { db } from './components/db/data'
+
+async function getProjects() {
+  const querySnapshot = await getDocs(collection(db, "projects"))
+  const projects = []
+  
+  querySnapshot.forEach((doc) => {
+    projects.push({
+      id: doc.id,
+      ...doc.data()
+    })
+  })
+  
+  return projects
+}
+
+// Use in a React component
+function ProjectList() {
+  const [projects, setProjects] = useState([])
+  
+  useEffect(() => {
+    getProjects().then(setProjects)
+  }, [])
+  
+  return (
+    <div>
+      {projects.map(project => (
+        <div key={project.id}>
+          <h2>{project.title}</h2>
+          <img src={project.img} alt={project.title} />
+          <p>{project.description}</p>
+          <a href={project.githubLink}>GitHub</a>
+          <a href={project.webLink}>Live Demo</a>
+        </div>
+      ))}
+    </div>
+  )
+}
+```
+
+## Security Rules
+
+### Firestore Rules
+
+Set up security rules in Firebase Console → Firestore Database → Rules:
+
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Public read access for projects
+    match /projects/{project} {
+      allow read: if true;
+      allow write: if false; // Only allow writes from backend/admin
+    }
+  }
+}
+```
+
+### Storage Rules
+
+Set up storage rules in Firebase Console → Storage → Rules:
+
+```javascript
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /images/{imageId} {
+      allow read: if true; // Public read access
+      allow write: if false; // No client-side uploads
+    }
+  }
+}
+```
+
+<Warning>
+  These rules allow public read access but prevent client-side writes. For production, manage content through a secure admin interface or backend.
+</Warning>
+
+## Best Practices
+
+<Steps>
+  <Step title="Use WebP format">
+    Always use WebP for images to reduce file size:
+    - Smaller files = faster loading
+    - Better compression than PNG/JPEG
+    - Supported in all modern browsers
+  </Step>
+
+  <Step title="Optimize images before upload">
+    Resize and compress images before uploading:
+    
+    ```bash
+    # Resize to max 1200px width
+    cwebp -resize 1200 0 input.png -o output.webp
+    ```
+  </Step>
+
+  <Step title="Cache download URLs">
+    Firebase Storage URLs don't change. Cache them to avoid repeated fetches:
+    
+    ```javascript
+    // Store URL in Firestore document
+    // Fetch once during upload, use many times
+    ```
+  </Step>
+
+  <Step title="Handle errors gracefully">
+    Always wrap Firebase calls in try-catch:
+    
+    ```javascript
+    try {
+      const url = await getDownloadURL(imageRef)
+    } catch (error) {
+      console.error('Failed to load image:', error)
+      // Show fallback image
+    }
+    ```
+  </Step>
+
+  <Step title="Use environment-specific configs">
+    Create separate Firebase projects for development and production:
+    - `.env.development` - Dev Firebase project
+    - `.env.production` - Production Firebase project
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+### Common Issues
+
+<AccordionGroup>
+  <Accordion title="Environment variables not working">
+    **Problem:** `import.meta.env.VITE_apiKey` is `undefined`
+    
+    **Solutions:**
+    - Ensure variables are prefixed with `VITE_`
+    - Restart dev server after changing `.env`
+    - Check `.env` is in project root
+    - Verify no quotes around values in `.env`
+  </Accordion>
+
+  <Accordion title="Storage permission denied">
+    **Problem:** Can't upload or download images
+    
+    **Solutions:**
+    - Check Firebase Storage rules
+    - Verify storage bucket name in config
+    - Ensure Firebase project has Storage enabled
+  </Accordion>
+
+  <Accordion title="Firestore permission denied">
+    **Problem:** Can't read or write documents
+    
+    **Solutions:**
+    - Check Firestore security rules
+    - Verify projectId in config
+    - Check collection and document paths
+  </Accordion>
+
+  <Accordion title="Image URLs not loading">
+    **Problem:** Images return 404 or don't display
+    
+    **Solutions:**
+    - Verify image exists in Storage console
+    - Check file path matches exactly (case-sensitive)
+    - Ensure CORS is configured if loading from different domain
+    - Check image URL format is correct
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Component Architecture" icon="cube" href="/components/projects">
+    Learn how components use Firebase data
+  </Card>
+  <Card title="Customization" icon="palette" href="/customization/content">
+    Customize your portfolio content
+  </Card>
+  <Card title="Firebase Docs" icon="link" href="https://firebase.google.com/docs">
+    Official Firebase documentation
+  </Card>
+  <Card title="Firestore Guide" icon="link" href="https://firebase.google.com/docs/firestore">
+    Deep dive into Firestore
+  </Card>
+</CardGroup>

@@ -1,0 +1,296 @@
+---
+title: "Hero Component"
+description: "Landing section with introduction, CTAs, and key highlights"
+icon: "rocket"
+---
+
+## Overview
+
+The Hero component serves as the landing section of the portfolio, presenting a compelling introduction with call-to-action buttons and key statistics. It features a modern card-based design with highlights showcasing experience and location.
+
+**Location:** `src/components/Main/Hero.jsx`
+
+## Key Features
+
+<CardGroup cols={2}>
+  <Card title="Dynamic Content" icon="language">
+    Fully internationalized with react-i18next for English and Spanish content
+  </Card>
+  <Card title="Call-to-Actions" icon="hand-pointer">
+    Dual CTAs directing users to contact section and projects showcase
+  </Card>
+  <Card title="Statistics Display" icon="chart-simple">
+    Highlights grid showing years of experience, projects, and location
+  </Card>
+  <Card title="Status Badge" icon="circle-check">
+    Live availability indicator with animated pulse effect
+  </Card>
+</CardGroup>
+
+## Component Structure
+
+```jsx
+function Hero() {
+  const { t } = useTranslation()
+  const highlights = t("hero.highlights", { returnObjects: true })
+
+  return (
+    <section id="hero" className="scroll-mt-32 px-6">
+      {/* Hero content */}
+    </section>
+  )
+}
+```
+
+### Translation Data
+
+The component fetches highlights as an array of objects:
+
+```javascript
+// English highlights
+[
+  { "label": "Years in tech", "value": "2+" },
+  { "label": "Projects delivered", "value": "5+" },
+  { "label": "Based in", "value": "Argentina" }
+]
+```
+
+## Layout
+
+The Hero uses a responsive grid layout:
+
+```jsx
+<div className="mx-auto grid max-w-6xl gap-10 overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/50 px-8 py-12 shadow-xl shadow-slate-950/40 backdrop-blur lg:grid-cols-[2fr,1fr]">
+  <div className="flex flex-col gap-6">
+    {/* Main content: tagline, title, description, CTAs */}
+  </div>
+  
+  <ul className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+    {/* Highlights cards */}
+  </ul>
+</div>
+```
+
+<Note>
+  The grid switches from `lg:grid-cols-[2fr,1fr]` on desktop to a single column on mobile, with highlights adapting from vertical to 3-column horizontal layout on tablets.
+</Note>
+
+## Content Sections
+
+### Status Tagline
+
+Live availability indicator with pulse animation:
+
+```jsx
+<span className="inline-flex items-center gap-2 self-start rounded-full border border-slate-700 bg-slate-900/70 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-sky-300">
+  <span className="h-2 w-2 rounded-full bg-emerald-400" />
+  {t("hero.tagline")}
+</span>
+```
+
+**Output:** 🟢 SOFTWARE DEVELOPER
+
+### Main Heading
+
+```jsx
+<h1 className="text-4xl font-semibold text-white sm:text-5xl lg:text-6xl">
+  {t("hero.title")}
+</h1>
+```
+
+Responsive typography scales from `text-4xl` to `text-6xl` across breakpoints.
+
+### Description Text
+
+```jsx
+<p className="max-w-2xl text-lg leading-relaxed text-slate-200">
+  {t("hero.description")}
+</p>
+
+<p className="max-w-2xl text-base text-slate-400">
+  {t("hero.secondary")}
+</p>
+```
+
+Two-tier description with primary (larger, brighter) and secondary (smaller, muted) text.
+
+## Call-to-Action Buttons
+
+<Tabs>
+  <Tab title="Primary CTA">
+    ```jsx
+    <a
+      href="#contact"
+      className="inline-flex items-center justify-center gap-2 rounded-full border border-emerald-500/70 bg-emerald-500/10 px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-emerald-200 transition hover:border-emerald-400 hover:bg-emerald-400/20"
+    >
+      <i className="bi bi-send-fill text-base" aria-hidden="true" />
+      {t("hero.ctaContact")}
+    </a>
+    ```
+    
+    **Purpose:** Direct users to contact section
+    
+    **Style:** Emerald accent with subtle glow effect
+  </Tab>
+  <Tab title="Secondary CTA">
+    ```jsx
+    <a
+      href="#projects"
+      className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-700 bg-slate-900/70 px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-slate-200 transition hover:border-slate-500 hover:bg-slate-800/80"
+    >
+      <i className="bi bi-grid-fill text-base" aria-hidden="true" />
+      {t("hero.ctaProjects")}
+    </a>
+    ```
+    
+    **Purpose:** Navigate to projects showcase
+    
+    **Style:** Neutral slate tone for secondary action
+  </Tab>
+</Tabs>
+
+<Note>
+  CTAs stack vertically on mobile (`flex-col`) and horizontally on desktop (`sm:flex-row`).
+</Note>
+
+## Highlights Section
+
+### Rendering Logic
+
+```jsx
+<ul className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+  {Array.isArray(highlights) &&
+    highlights.map((item, index) => (
+      <li
+        key={`hero-highlight-${index}`}
+        className="rounded-2xl border border-slate-800 bg-slate-900/70 px-6 py-5 shadow-inner shadow-slate-950/40"
+      >
+        <p className="text-3xl font-semibold text-white">{item?.value}</p>
+        <p className="text-sm uppercase tracking-[0.3em] text-slate-400">{item?.label}</p>
+      </li>
+    ))}
+</ul>
+```
+
+### Highlight Card Example
+
+<Accordion title="Visual representation">
+  Each highlight renders as:
+  
+  ```
+  ┌─────────────────────────┐
+  │                         │
+  │         2+              │  ← value (large, white)
+  │   YEARS IN TECH         │  ← label (small, muted)
+  │                         │
+  └─────────────────────────┘
+  ```
+</Accordion>
+
+## Translation Keys
+
+| Key | English | Spanish |
+|-----|---------|----------|
+| `hero.tagline` | Software Developer | Software Developer |
+| `hero.title` | I turn ideas into software that truly works | Transformo ideas en software que realmente funciona |
+| `hero.description` | I design, build, and maintain digital products... | Diseño, desarrollo y mantengo productos digitales... |
+| `hero.secondary` | I'm currently part of Asince SRL... | Hoy formo parte de Asince SRL... |
+| `hero.ctaContact` | Let's collaborate | Colaboremos |
+| `hero.ctaProjects` | View projects | Ver proyectos |
+
+## Styling Details
+
+### Container Card
+
+```css
+.hero-container {
+  border-radius: 1.5rem;
+  border: 1px solid rgb(30 41 59); /* slate-800 */
+  background: rgb(15 23 42 / 0.5); /* slate-900/50 */
+  backdrop-filter: blur(8px);
+  box-shadow: 0 25px 50px -12px rgb(2 6 23 / 0.4);
+}
+```
+
+**Design features:**
+- Semi-transparent background with backdrop blur
+- Subtle border for definition
+- Large shadow for depth
+- Rounded corners for modern feel
+
+### Typography Scale
+
+<CardGroup cols={3}>
+  <Card title="Mobile" icon="mobile">
+    - Title: `text-4xl` (36px)
+    - Description: `text-lg` (18px)
+    - Secondary: `text-base` (16px)
+  </Card>
+  <Card title="Tablet" icon="tablet">
+    - Title: `text-5xl` (48px)
+    - Description: `text-lg` (18px)
+    - Secondary: `text-base` (16px)
+  </Card>
+  <Card title="Desktop" icon="desktop">
+    - Title: `text-6xl` (60px)
+    - Description: `text-lg` (18px)
+    - Secondary: `text-base` (16px)
+  </Card>
+</CardGroup>
+
+## Accessibility
+
+- **Semantic HTML**: Uses `<section>` for landmark navigation
+- **Heading hierarchy**: Proper `<h1>` for main title
+- **Icon labels**: `aria-hidden="true"` on decorative icons
+- **List structure**: Proper `<ul>` and `<li>` for highlights
+- **Scroll margin**: `scroll-mt-32` ensures proper spacing when navigating via anchor links
+
+## Responsive Behavior
+
+```
+Mobile (< 640px):
+┌──────────────────┐
+│   Tagline        │
+│   Title          │
+│   Description    │
+│   CTAs (stack)   │
+│                  │
+│ ┌──┐ ┌──┐ ┌──┐  │  ← Highlights horizontal
+│ └──┘ └──┘ └──┘  │
+└──────────────────┘
+
+Desktop (≥ 1024px):
+┌────────────────────────────────┐
+│  Tagline              ┌──────┐ │
+│  Title                │  2+  │ │ ← Highlights
+│  Description          └──────┘ │   vertical
+│  CTAs (horizontal)    ┌──────┐ │
+│                       │  5+  │ │
+│                       └──────┘ │
+│                       ┌──────┐ │
+│                       │ ARG  │ │
+│                       └──────┘ │
+└────────────────────────────────┘
+```
+
+## Integration
+
+```jsx
+import Hero from "./components/Main/Hero"
+
+function App() {
+  return (
+    <main>
+      <Hero />
+      {/* Other sections */}
+    </main>
+  )
+}
+```
+
+## Dependencies
+
+- **react-i18next**: Translation management
+- **Tailwind CSS**: Utility styling
+- **Bootstrap Icons**: Icon library for CTAs

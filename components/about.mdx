@@ -1,0 +1,372 @@
+---
+title: "About Component"
+description: "Personal background section with highlights and focus areas"
+icon: "user"
+---
+
+## Overview
+
+The About component presents Federico Moretto's professional background, key competencies, and current areas of exploration. It features a two-column layout with rich content on the left and a portrait image on the right, complete with decorative background effects.
+
+**Location:** `src/components/Main/About.jsx`
+
+## Key Features
+
+<CardGroup cols={2}>
+  <Card title="Multi-Paragraph Story" icon="book">
+    Rich narrative content with multiple paragraphs from translation keys
+  </Card>
+  <Card title="Highlights Grid" icon="check-circle">
+    Key competencies displayed in a responsive grid with checkmark icons
+  </Card>
+  <Card title="Focus Areas" icon="compass">
+    Current exploration topics in gradient cards
+  </Card>
+  <Card title="Portrait Display" icon="image">
+    Professional photo with decorative blur effects
+  </Card>
+</CardGroup>
+
+## Component Structure
+
+```jsx
+function About() {
+  const { t } = useTranslation()
+  const description = t("about.description", { returnObjects: true })
+  const highlights = t("about.highlights", { returnObjects: true })
+  const focusAreas = t("about.focusAreas", { returnObjects: true })
+
+  return (
+    <section id="about" className="scroll-mt-32 px-6">
+      {/* Content */}
+    </section>
+  )
+}
+```
+
+### Translation Data Structure
+
+All content is fetched as arrays from translation dictionaries:
+
+```javascript
+// Description - array of paragraphs
+[
+  "Hi! I'm Federico Moretto — a developer passionate about...",
+  "At Asince SRL, I combine incident response with product development...",
+  "My time working in foreign trade strengthened my analytical thinking..."
+]
+
+// Highlights - array of strings
+[
+  "Identify and resolve production issues before they affect users.",
+  "Design automations that reduce manual work and speed up support processes.",
+  "Improve user interfaces while respecting accessibility and visual consistency.",
+  "Monitor infrastructure and performance across cloud services and databases."
+]
+
+// Focus Areas - array of strings
+[
+  "AI-powered tools to speed up debugging and support workflows.",
+  "Design systems that keep multilingual products consistent.",
+  "Cloud-native observability and incident response strategies.",
+  "Scalable APIs with .NET and serverless deployments."
+]
+```
+
+## Layout Structure
+
+The component uses a responsive grid layout:
+
+```jsx
+<div className="mx-auto grid max-w-6xl gap-10 overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/50 px-8 py-12 shadow-xl shadow-slate-950/40 backdrop-blur lg:grid-cols-[3fr,2fr]">
+  <div className="flex flex-col gap-6">
+    {/* Content column: Title, description, highlights, focus areas */}
+  </div>
+  
+  <figure className="relative flex items-center justify-center">
+    {/* Portrait image with decorative effects */}
+  </figure>
+</div>
+```
+
+<Note>
+  The grid ratio `lg:grid-cols-[3fr,2fr]` gives more space to content (60%) than the image (40%) on desktop.
+</Note>
+
+## Content Sections
+
+### Section Header
+
+```jsx
+<div>
+  <span className="text-sm uppercase tracking-[0.3em] text-sky-300">
+    {t("about.subtitle")}
+  </span>
+  <h2 className="mt-3 text-3xl font-semibold text-white sm:text-4xl">
+    {t("about.title")}
+  </h2>
+</div>
+```
+
+**Output:**
+- Subtitle: "STORY" (sky blue, small caps)
+- Title: "From tech support to full-stack developer" (large, white)
+
+### Description Paragraphs
+
+```jsx
+<div className="flex flex-col gap-4 text-base leading-relaxed text-slate-200">
+  {Array.isArray(description) &&
+    description.map((paragraph, index) => (
+      <p key={`about-paragraph-${index}`}>{paragraph}</p>
+    ))}
+</div>
+```
+
+Dynamically renders all description paragraphs with consistent spacing.
+
+## Highlights Section
+
+### Title and Grid
+
+```jsx
+<div>
+  <h3 className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-400">
+    {t("about.highlightsTitle")}
+  </h3>
+  <ul className="mt-3 grid gap-3 sm:grid-cols-2">
+    {/* Highlight items */}
+  </ul>
+</div>
+```
+
+### Individual Highlight Card
+
+```jsx
+<li
+  key={`about-highlight-${index}`}
+  className="flex items-start gap-3 rounded-2xl border border-slate-800 bg-slate-900/70 px-4 py-3 text-sm leading-relaxed text-slate-200"
+>
+  <span className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300">
+    <i className="bi bi-check2" aria-hidden="true" />
+  </span>
+  <span>{item}</span>
+</li>
+```
+
+<Tabs>
+  <Tab title="Visual Structure">
+    ```
+    ┌─────────────────────────────────────┐
+    │ ✓  Identify and resolve production  │
+    │    issues before they affect users  │
+    └─────────────────────────────────────┘
+    ```
+    
+    - Checkmark icon in emerald circular badge
+    - Text aligned to start with gap
+    - Rounded card with border
+  </Tab>
+  <Tab title="Responsive Grid">
+    - **Mobile**: Single column (stacked)
+    - **Desktop** (`sm:grid-cols-2`): Two columns side-by-side
+  </Tab>
+</Tabs>
+
+## Focus Areas Section
+
+```jsx
+<div>
+  <h3 className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-400">
+    {t("about.focusTitle")}
+  </h3>
+  <div className="mt-3 grid gap-3 sm:grid-cols-2">
+    {Array.isArray(focusAreas) &&
+      focusAreas.map((area, index) => (
+        <div
+          key={`about-focus-${index}`}
+          className="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900/80 via-slate-900/40 to-slate-900/80 px-4 py-4 text-sm text-slate-200 shadow-inner shadow-slate-950/40"
+        >
+          {area}
+        </div>
+      ))}
+  </div>
+</div>
+```
+
+<Note>
+  Focus area cards use a **gradient background** (`bg-gradient-to-br`) with varying opacity for visual depth and an **inner shadow** for a subtle inset effect.
+</Note>
+
+## Portrait Image Section
+
+### Decorative Background Effects
+
+```jsx
+<figure className="relative flex items-center justify-center">
+  <div className="absolute -top-10 h-32 w-32 rounded-full bg-emerald-500/20 blur-3xl" aria-hidden="true" />
+  <div className="absolute -bottom-12 right-0 h-32 w-32 rounded-full bg-sky-500/10 blur-3xl" aria-hidden="true" />
+  
+  <img
+    src={fede}
+    alt="Federico Moretto portrait"
+    className="relative z-10 h-auto w-full max-w-sm rounded-3xl border border-slate-700 object-scale-down shadow-xl shadow-slate-950/50"
+  />
+</figure>
+```
+
+**Effect breakdown:**
+- **Top blur**: Emerald-tinted glow positioned above image
+- **Bottom-right blur**: Sky-tinted glow positioned below-right
+- **Image**: Layered on top (`z-10`) with rounded corners and border
+
+<Accordion title="Visual representation">
+  ```
+         🟢 emerald blur (top)
+  
+    ┌──────────────────┐
+    │                  │
+    │   Portrait       │
+    │   Photo          │
+    │                  │
+    └──────────────────┘
+                  🔵 sky blur (bottom-right)
+  ```
+</Accordion>
+
+## Translation Keys
+
+<Tabs>
+  <Tab title="Section Headers">
+    | Key | English | Spanish |
+    |-----|---------|----------|
+    | `about.subtitle` | Story | Historia |
+    | `about.title` | From tech support to full-stack developer | De soporte técnico a desarrollador full-stack |
+    | `about.highlightsTitle` | My team trusts me to | Mi equipo confía en mí para |
+    | `about.focusTitle` | Currently exploring | Lo que estoy explorando |
+  </Tab>
+  <Tab title="Content Arrays">
+    | Key | Type | Count |
+    |-----|------|-------|
+    | `about.description` | Array of strings | 3 paragraphs |
+    | `about.highlights` | Array of strings | 4 items |
+    | `about.focusAreas` | Array of strings | 4 items |
+  </Tab>
+</Tabs>
+
+## Styling Details
+
+### Color Scheme
+
+<CardGroup cols={3}>
+  <Card title="Text Colors" icon="palette">
+    - Primary: `text-white` (headings)
+    - Body: `text-slate-200` (content)
+    - Muted: `text-slate-400` (labels)
+    - Accent: `text-sky-300` (subtitle)
+  </Card>
+  <Card title="Background" icon="fill">
+    - Container: `bg-slate-900/50`
+    - Cards: `bg-slate-900/70`
+    - Borders: `border-slate-800`
+    - Effects: Gradients & inner shadows
+  </Card>
+  <Card title="Accent Colors" icon="droplet">
+    - Checkmarks: `bg-emerald-500/20` + `text-emerald-300`
+    - Image blur: Emerald & Sky with low opacity
+  </Card>
+</CardGroup>
+
+### Spacing Pattern
+
+```jsx
+// Main container
+gap-10         // Between content and image
+
+// Content column
+gap-6          // Between major sections
+gap-4          // Between description paragraphs
+gap-3          // Between cards in grids
+gap-2          // Within section (title + content)
+```
+
+## Responsive Behavior
+
+```
+Mobile (< 1024px):
+┌─────────────────────────────┐
+│  STORY                      │
+│  Title                      │
+│  Paragraph 1                │
+│  Paragraph 2                │
+│  Paragraph 3                │
+│                             │
+│  MY TEAM TRUSTS ME TO       │
+│  ┌──────────┐ ┌──────────┐ │
+│  │Highlight1│ │Highlight2│ │
+│  └──────────┘ └──────────┘ │
+│  ┌──────────┐ ┌──────────┐ │
+│  │Highlight3│ │Highlight4│ │
+│  └──────────┘ └──────────┘ │
+│                             │
+│  CURRENTLY EXPLORING        │
+│  [Focus areas grid]         │
+│                             │
+│      [Portrait Image]       │
+└─────────────────────────────┘
+
+Desktop (≥ 1024px):
+┌─────────────────────────────────────────┐
+│  STORY                    ┌───────────┐ │
+│  Title                    │           │ │
+│  Paragraphs               │  Portrait │ │
+│                           │   Image   │ │
+│  Highlights (2 cols)      │           │ │
+│                           │           │ │
+│  Focus areas (2 cols)     └───────────┘ │
+└─────────────────────────────────────────┘
+```
+
+## Accessibility
+
+- **Semantic HTML**: `<section>`, `<figure>`, `<h2>`, `<h3>` tags
+- **Alternative text**: Descriptive alt text for portrait image
+- **Decorative elements**: `aria-hidden="true"` on blur effects
+- **Heading hierarchy**: Proper h2 → h3 nesting
+- **List structure**: `<ul>` and `<li>` for highlights
+- **Scroll margin**: `scroll-mt-32` for anchor navigation
+
+## Image Asset
+
+The component imports a portrait image:
+
+```jsx
+import fede from "../../assets/Foto.jpeg"
+```
+
+<Warning>
+  Ensure the image file exists at `src/assets/Foto.jpeg` for proper rendering.
+</Warning>
+
+## Integration Example
+
+```jsx
+import About from "./components/Main/About"
+
+function MainContent() {
+  return (
+    <main>
+      <Hero />
+      <About />
+      {/* Other sections */}
+    </main>
+  )
+}
+```
+
+## Dependencies
+
+- **react-i18next**: Translation management
+- **Tailwind CSS**: Utility styling
+- **Bootstrap Icons**: Icon library (bi-check2)
+- **Image asset**: Portrait photo at `src/assets/Foto.jpeg`

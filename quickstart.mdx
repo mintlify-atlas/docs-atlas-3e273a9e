@@ -1,80 +1,373 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: Quickstart
+description: Get Portfolio Moretto running locally in minutes
 ---
 
-## Get started in three steps
+## Get Up and Running
 
-Get your documentation site running locally and make your first customization.
+This guide will help you clone, configure, and run Portfolio Moretto on your local machine. You'll go from zero to a fully functional portfolio in less than 10 minutes.
 
-### Step 1: Set up your local environment
+<Steps>
+  <Step title="Check Prerequisites">
+    Before you begin, make sure you have the following installed:
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
+    **Node.js** (version 16.x or higher)
+    ```bash
+    node --version
+    # Should output v16.x.x or higher
+    ```
 
-### Step 2: Deploy your changes
+    **npm** (comes with Node.js)
+    ```bash
+    npm --version
+    # Should output 8.x.x or higher
+    ```
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+    <Note>
+      If you don't have Node.js installed, download it from [nodejs.org](https://nodejs.org/). We recommend the LTS (Long Term Support) version.
+    </Note>
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+    **Git** (for cloning the repository)
+    ```bash
+    git --version
+    ```
+  </Step>
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+  <Step title="Clone the Repository">
+    Clone the Portfolio Moretto repository to your local machine:
 
-### Step 3: Go live
+    ```bash
+    git clone https://github.com/fedemoretto11/portfolio-moretto.git
+    cd portfolio-moretto
+    ```
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+    <Note>
+      Make sure to replace the repository URL with your actual repository URL if you've forked the project.
+    </Note>
+  </Step>
 
-## Next steps
+  <Step title="Install Dependencies">
+    Install all required npm packages using the package manager:
 
-Now that you have your docs running, explore these key features:
+    ```bash
+    npm install
+    ```
+
+    This will install all dependencies listed in `package.json`, including:
+
+    <CodeGroup>
+    ```json Core Dependencies
+    {
+      "react": "^18.2.0",
+      "react-dom": "^18.2.0",
+      "react-i18next": "^14.0.5",
+      "i18next": "^23.10.0"
+    }
+    ```
+
+    ```json Styling
+    {
+      "tailwindcss": "^3.3.3",
+      "sass": "^1.66.1",
+      "bootstrap-icons": "^1.10.5"
+    }
+    ```
+
+    ```json Firebase
+    {
+      "firebase": "^10.3.1",
+      "@firebase/storage": "^0.11.2"
+    }
+    ```
+
+    ```json Build Tools
+    {
+      "vite": "^4.4.5",
+      "@vitejs/plugin-react": "^4.0.3"
+    }
+    ```
+    </CodeGroup>
+
+    The installation typically takes 1-2 minutes depending on your internet connection.
+  </Step>
+
+  <Step title="Configure Firebase (Optional)">
+    The portfolio uses Firebase for storing project data and images. If you want to use your own Firebase project:
+
+    ### Create a Firebase Project
+
+    1. Go to [Firebase Console](https://console.firebase.google.com/)
+    2. Click "Add project" and follow the setup wizard
+    3. Enable **Firestore Database** and **Storage** in your project
+
+    ### Get Your Firebase Credentials
+
+    1. In Firebase Console, go to Project Settings (gear icon)
+    2. Scroll down to "Your apps" and click the web icon (`</>`)
+    3. Register your app and copy the `firebaseConfig` object
+
+    ### Create Environment File
+
+    Create a `.env.development` file in the project root:
+
+    ```bash
+    touch .env.development
+    ```
+
+    Add your Firebase configuration:
+
+    ```bash .env.development
+    VITE_apiKey=your-api-key-here
+    VITE_authDomain=your-project.firebaseapp.com
+    VITE_projectId=your-project-id
+    VITE_storageBucket=your-project.appspot.com
+    VITE_messagingSenderId=your-messaging-sender-id
+    VITE_appId=your-app-id
+    ```
+
+    <Warning>
+      Never commit your `.env.development` file to version control. It's already included in `.gitignore` to prevent accidental commits.
+    </Warning>
+
+    ### Environment Variables in Code
+
+    The Firebase configuration is accessed using Vite's environment variable syntax:
+
+    ```javascript src/components/db/data.js
+    const firebaseConfig = {
+      apiKey: import.meta.env.VITE_apiKey,
+      authDomain: import.meta.env.VITE_authDomain,
+      projectId: import.meta.env.VITE_projectId,
+      storageBucket: import.meta.env.VITE_storageBucket,
+      messagingSenderId: import.meta.env.VITE_messagingSenderId,
+      appId: import.meta.env.VITE_appId,
+    };
+    ```
+
+    <Note>
+      If you skip Firebase setup, the app will still run but project data won't be loaded from the database. You can add projects manually or work on other features first.
+    </Note>
+  </Step>
+
+  <Step title="Start the Development Server">
+    Launch the development server with hot module replacement:
+
+    ```bash
+    npm run dev
+    ```
+
+    You should see output similar to:
+
+    ```bash
+    VITE v4.4.5  ready in 500 ms
+
+    ➜  Local:   http://localhost:5173/
+    ➜  Network: use --host to expose
+    ➜  press h to show help
+    ```
+
+    Open your browser and navigate to `http://localhost:5173/`
+
+    <Note>
+      Vite provides extremely fast hot module replacement (HMR). Any changes you make to your code will be reflected in the browser almost instantly without a full page reload.
+    </Note>
+  </Step>
+
+  <Step title="Explore the Application">
+    Your portfolio is now running! Here's what you can explore:
+
+    ### Main Sections
+
+    - **Hero Section** (`/#hero`) - Main introduction with call-to-action buttons
+    - **About** (`/#about`) - Personal story and highlights
+    - **Skills** (`/#technology`) - Technology stack showcase
+    - **Experience** (`/#works`) - Professional work history
+    - **Projects** (`/#projects`) - Project portfolio with filtering
+    - **Contact** (`/#contact`) - Contact information and links
+
+    ### Language Switching
+
+    Click the language switcher in the header to toggle between English and Spanish:
+
+    ```jsx src/components/Header/Header.jsx
+    // The application supports ES (Spanish) and EN (English)
+    // Translations are stored in:
+    // - src/components/dictionaries/es.json
+    // - src/components/dictionaries/en.json
+    ```
+
+    ### Component Structure
+
+    The main app structure is defined in `src/App.jsx`:
+
+    ```jsx src/App.jsx
+    import Footer from "./components/Footer/Footer"
+    import Header from "./components/Header/Header"
+    import MainContainer from "./components/Main/MainContainer"
+
+    function App() {
+      return (
+        <>
+          <Header />
+          <MainContainer />
+          <Footer />
+        </>
+      )
+    }
+    ```
+  </Step>
+</Steps>
+
+## Build for Production
+
+When you're ready to deploy your portfolio:
+
+<Steps>
+  <Step title="Create Production Build">
+    Build the optimized production bundle:
+
+    ```bash
+    npm run build
+    ```
+
+    This command:
+    - Bundles all JavaScript and CSS
+    - Minifies and optimizes assets
+    - Generates a `dist/` directory with production-ready files
+
+    ```bash
+    vite v4.4.5 building for production...
+    ✓ 1234 modules transformed.
+    dist/index.html                  0.45 kB │ gzip:  0.30 kB
+    dist/assets/index-a1b2c3d4.css  23.45 kB │ gzip:  5.67 kB
+    dist/assets/index-e5f6g7h8.js  145.67 kB │ gzip: 48.90 kB
+    ✓ built in 5.43s
+    ```
+  </Step>
+
+  <Step title="Preview Production Build">
+    Test the production build locally:
+
+    ```bash
+    npm run preview
+    ```
+
+    This starts a local server serving your production build at `http://localhost:4173/`
+  </Step>
+
+  <Step title="Deploy">
+    The `dist/` folder contains your production-ready static site. Deploy it to any static hosting service:
+
+    <CardGroup cols={2}>
+      <Card title="Vercel" icon="triangle" href="https://vercel.com">
+        Zero-config deployment with automatic HTTPS
+      </Card>
+      <Card title="Netlify" icon="cloud" href="https://netlify.com">
+        Continuous deployment from Git
+      </Card>
+      <Card title="Firebase Hosting" icon="fire" href="https://firebase.google.com/docs/hosting">
+        Google's fast and secure hosting
+      </Card>
+      <Card title="GitHub Pages" icon="github" href="https://pages.github.com">
+        Free hosting directly from your repository
+      </Card>
+    </CardGroup>
+  </Step>
+</Steps>
+
+## Available Scripts
+
+Here are all the scripts defined in `package.json`:
+
+```json package.json
+{
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  }
+}
+```
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server with HMR at `http://localhost:5173` |
+| `npm run build` | Create optimized production build in `dist/` directory |
+| `npm run lint` | Run ESLint to check code quality and catch errors |
+| `npm run preview` | Preview production build locally at `http://localhost:4173` |
+
+## Troubleshooting
+
+### Port Already in Use
+
+If port 5173 is already in use:
+
+```bash
+# Vite will automatically try the next available port
+# Or specify a custom port:
+vite --port 3000
+```
+
+### Firebase Connection Issues
+
+If you see Firebase errors in the console:
+
+1. Verify your `.env.development` file has all required variables
+2. Check that your Firebase project has Firestore and Storage enabled
+3. Ensure your Firebase rules allow read access
+
+```javascript
+// Firestore Rules (for development)
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /projects/{project} {
+      allow read: if true;
+    }
+  }
+}
+```
+
+### Node Version Issues
+
+If you encounter errors related to Node.js version:
+
+```bash
+# Check your Node version
+node --version
+
+# Use nvm to switch versions if needed
+nvm install 18
+nvm use 18
+```
+
+<Warning>
+  The project requires Node.js 16.x or higher. Some dependencies may not work with older versions.
+</Warning>
+
+## Next Steps
 
 <CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+  <Card title="Customize Content" icon="pen" href="/customization/content">
+    Learn how to personalize the portfolio with your own information
+  </Card>
+  <Card title="Firebase Setup" icon="database" href="/development/firebase">
+    Set up Firestore database and add your projects
+  </Card>
+  <Card title="Internationalization" icon="globe" href="/architecture/internationalization">
+    Understand the translation system and add more languages
+  </Card>
+  <Card title="Components Guide" icon="code" href="/components/header">
+    Deep dive into the React component architecture
+  </Card>
 </CardGroup>
 
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>
+## Need Help?
+
+If you run into issues:
+
+- Check the [GitHub repository](https://github.com/fedemoretto11/portfolio-moretto) for updates
+- Review the [Vite documentation](https://vitejs.dev/) for build tool questions
+- Consult [React docs](https://react.dev/) for React-specific help
+- Visit [Firebase docs](https://firebase.google.com/docs) for database and storage issues

@@ -1,0 +1,421 @@
+---
+title: "Contact Component"
+description: "Contact information section with email and resume CTAs"
+icon: "envelope"
+---
+
+## Overview
+
+The Contact component provides a clear call-to-action for visitors to reach out to Federico Moretto. It features two primary actions: sending an email and downloading a resume, presented in a centered, visually prominent card design with gradient background.
+
+**Location:** `src/components/Main/Contact.jsx`
+
+## Key Features
+
+<CardGroup cols={2}>
+  <Card title="Dual CTAs" icon="hand-pointer">
+    Email contact and resume download options for different user preferences
+  </Card>
+  <Card title="Centered Layout" icon="align-center">
+    Text-centered design for maximum visual impact and clear messaging
+  </Card>
+  <Card title="Gradient Background" icon="palette">
+    Diagonal gradient creates visual interest and draws attention
+  </Card>
+  <Card title="Multi-Paragraph Content" icon="paragraph">
+    Dynamic description array for flexible messaging
+  </Card>
+</CardGroup>
+
+## Component Structure
+
+```jsx
+function Contact() {
+  const { t } = useTranslation()
+  const description = t("contact.description", { returnObjects: true })
+
+  return (
+    <section id="contact" className="scroll-mt-32 px-6">
+      {/* Content */}
+    </section>
+  )
+}
+```
+
+### Translation Data Structure
+
+```javascript
+// Description - array of paragraphs
+[
+  "I'm open to new opportunities, remote projects, and conversations about software and product growth.",
+  "Prefer async? Send me an email or grab my latest resume."
+]
+```
+
+## Layout Structure
+
+```jsx
+<section id="contact" className="scroll-mt-32 px-6">
+  <div className="mx-auto flex max-w-4xl flex-col gap-6 overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900/70 via-slate-900/40 to-slate-900/70 px-8 py-12 text-center shadow-xl shadow-slate-950/40 backdrop-blur">
+    {/* Content */}
+  </div>
+</section>
+```
+
+<Note>
+  The container uses `max-w-4xl` (narrower than other sections' `max-w-6xl`) to create a more focused, intimate feel appropriate for a contact section.
+</Note>
+
+## Content Sections
+
+### Section Header
+
+```jsx
+<span className="text-sm uppercase tracking-[0.3em] text-sky-300">
+  {t("contact.subtitle")}
+</span>
+<h2 className="text-3xl font-semibold text-white sm:text-4xl">
+  {t("contact.title")}
+</h2>
+```
+
+**Output:**
+- Subtitle: "COLLABORATION" (sky blue, small caps)
+- Title: "Let's build something meaningful" (large, white)
+
+### Description Paragraphs
+
+```jsx
+<div className="flex flex-col gap-4 text-base leading-relaxed text-slate-200">
+  {Array.isArray(description) &&
+    description.map((paragraph, index) => (
+      <p key={`contact-paragraph-${index}`}>{paragraph}</p>
+    ))}
+</div>
+```
+
+Dynamically renders description paragraphs from translation array.
+
+## Call-to-Action Buttons
+
+### Button Container
+
+```jsx
+<div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+  {/* Email and Resume CTAs */}
+</div>
+```
+
+Buttons stack vertically on mobile and horizontally on desktop.
+
+### Email CTA (Primary)
+
+```jsx
+<a
+  href="mailto:fedemoretto94@gmail.com"
+  className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-emerald-500/70 bg-emerald-500/10 px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-emerald-200 transition hover:border-emerald-400 hover:bg-emerald-400/20 sm:w-auto"
+>
+  <i className="bi bi-envelope-paper-heart" aria-hidden="true" />
+  {t("contact.ctaEmail")}
+</a>
+```
+
+<Tabs>
+  <Tab title="Styling Details">
+    **Color scheme:**
+    - Border: `border-emerald-500/70`
+    - Background: `bg-emerald-500/10`
+    - Text: `text-emerald-200`
+    
+    **Hover effects:**
+    - Border: `hover:border-emerald-400`
+    - Background: `hover:bg-emerald-400/20`
+    
+    **Responsive width:**
+    - Mobile: `w-full` (full width)
+    - Desktop: `sm:w-auto` (content width)
+  </Tab>
+  <Tab title="Functionality">
+    **Email link:**
+    ```html
+    <a href="mailto:fedemoretto94@gmail.com">
+    ```
+    
+    Opens default email client with pre-filled recipient address.
+    
+    **Icon:** `bi-envelope-paper-heart` (Bootstrap Icons)
+  </Tab>
+</Tabs>
+
+### Resume CTA (Secondary)
+
+```jsx
+<a
+  href="https://drive.google.com/file/d/1e-iDQ2UlwQLCyRHULMOqovKSGq_Iavf2/view?usp=drive_link"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-slate-700 bg-slate-900/70 px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-slate-200 transition hover:border-slate-500 hover:bg-slate-800/80 sm:w-auto"
+>
+  <i className="bi bi-file-earmark-arrow-down" aria-hidden="true" />
+  {t("contact.ctaResume")}
+</a>
+```
+
+<Accordion title="Resume link details">
+  **Google Drive link:**
+  - Hosted on Google Drive for easy updates
+  - Opens in new tab (`target="_blank"`)
+  - Security attributes: `rel="noopener noreferrer"`
+  
+  **Styling:**
+  - Slate color scheme (secondary action)
+  - Same size and shape as primary CTA
+  - Distinct from primary with muted colors
+  
+  **Icon:** `bi-file-earmark-arrow-down`
+</Accordion>
+
+## Complete Component Example
+
+```jsx
+<section id="contact" className="scroll-mt-32 px-6">
+  <div className="mx-auto flex max-w-4xl flex-col gap-6 overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900/70 via-slate-900/40 to-slate-900/70 px-8 py-12 text-center shadow-xl shadow-slate-950/40 backdrop-blur">
+    {/* Subtitle */}
+    <span className="text-sm uppercase tracking-[0.3em] text-sky-300">
+      COLLABORATION
+    </span>
+    
+    {/* Title */}
+    <h2 className="text-3xl font-semibold text-white sm:text-4xl">
+      Let's build something meaningful
+    </h2>
+
+    {/* Description */}
+    <div className="flex flex-col gap-4 text-base leading-relaxed text-slate-200">
+      <p>I'm open to new opportunities, remote projects, and conversations about software and product growth.</p>
+      <p>Prefer async? Send me an email or grab my latest resume.</p>
+    </div>
+
+    {/* CTAs */}
+    <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+      <a href="mailto:fedemoretto94@gmail.com" className="...">
+        <i className="bi bi-envelope-paper-heart" aria-hidden="true" />
+        Send email
+      </a>
+      <a href="https://drive.google.com/..." target="_blank" rel="noopener noreferrer" className="...">
+        <i className="bi bi-file-earmark-arrow-down" aria-hidden="true" />
+        Download resume
+      </a>
+    </div>
+  </div>
+</section>
+```
+
+## Translation Keys
+
+| Key | English | Spanish |
+|-----|---------|----------|
+| `contact.subtitle` | Collaboration | Colaboración |
+| `contact.title` | Let's build something meaningful | Construyamos algo que valga la pena |
+| `contact.ctaEmail` | Send email | Enviar email |
+| `contact.ctaResume` | Download resume | Descargar CV |
+
+## Styling Details
+
+### Gradient Background
+
+```css
+background: linear-gradient(
+  to bottom right,
+  rgb(15 23 42 / 0.7),  /* from-slate-900/70 */
+  rgb(15 23 42 / 0.4),  /* via-slate-900/40 */
+  rgb(15 23 42 / 0.7)   /* to-slate-900/70 */
+);
+```
+
+<Note>
+  The gradient creates a **lighter center** effect, drawing the eye toward the middle of the card where the title sits.
+</Note>
+
+### Visual Hierarchy
+
+<CardGroup cols={3}>
+  <Card title="Subtitle" icon="tag">
+    - Size: `text-sm` (14px)
+    - Color: `text-sky-300`
+    - Transform: Uppercase
+    - Tracking: `0.3em`
+  </Card>
+  <Card title="Title" icon="heading">
+    - Size: `text-3xl` → `text-4xl`
+    - Color: `text-white`
+    - Weight: `font-semibold`
+  </Card>
+  <Card title="Body" icon="paragraph">
+    - Size: `text-base` (16px)
+    - Color: `text-slate-200`
+    - Leading: `leading-relaxed`
+  </Card>
+</CardGroup>
+
+### Button Comparison
+
+| Aspect | Primary (Email) | Secondary (Resume) |
+|--------|-----------------|---------------------|
+| **Border** | `border-emerald-500/70` | `border-slate-700` |
+| **Background** | `bg-emerald-500/10` | `bg-slate-900/70` |
+| **Text** | `text-emerald-200` | `text-slate-200` |
+| **Hover Border** | `hover:border-emerald-400` | `hover:border-slate-500` |
+| **Hover BG** | `hover:bg-emerald-400/20` | `hover:bg-slate-800/80` |
+| **Icon** | `bi-envelope-paper-heart` | `bi-file-earmark-arrow-down` |
+
+## Responsive Behavior
+
+```
+Mobile (< 640px):
+┌─────────────────────────┐
+│    COLLABORATION        │
+│                         │
+│  Let's build something  │
+│     meaningful          │
+│                         │
+│  Paragraph 1            │
+│  Paragraph 2            │
+│                         │
+│ ┌─────────────────────┐ │
+│ │  📧 Send email      │ │ ← Full width
+│ └─────────────────────┘ │
+│ ┌─────────────────────┐ │
+│ │  📄 Download resume │ │ ← Full width
+│ └─────────────────────┘ │
+└─────────────────────────┘
+
+Desktop (≥ 640px):
+┌──────────────────────────────────┐
+│       COLLABORATION              │
+│                                  │
+│   Let's build something          │
+│        meaningful                │
+│                                  │
+│      Paragraph 1                 │
+│      Paragraph 2                 │
+│                                  │
+│  [📧 Send email] [📄 Download]   │ ← Side by side
+└──────────────────────────────────┘
+```
+
+## Accessibility
+
+- **Semantic HTML**: `<section>` landmark element
+- **Heading hierarchy**: Proper `<h2>` for section title
+- **Link attributes**: 
+  - `target="_blank"` for external link
+  - `rel="noopener noreferrer"` for security
+- **Icon labels**: `aria-hidden="true"` on decorative icons
+- **Scroll margin**: `scroll-mt-32` for anchor navigation
+- **Keyboard navigation**: All CTAs fully keyboard accessible
+- **Color contrast**: Text meets WCAG AA standards
+- **Focus states**: Visible focus indicators on interactive elements
+
+## Email Integration
+
+```html
+<a href="mailto:fedemoretto94@gmail.com">
+```
+
+**Behavior:**
+- Opens user's default email client
+- Pre-fills "To:" field with contact address
+- Platform-agnostic (works on desktop and mobile)
+
+<Warning>
+  Some email clients may be blocked by browser security settings. Consider providing an alternative like a contact form for better reliability.
+</Warning>
+
+## Resume Hosting
+
+The resume is hosted on Google Drive:
+
+```
+https://drive.google.com/file/d/1e-iDQ2UlwQLCyRHULMOqovKSGq_Iavf2/view?usp=drive_link
+```
+
+**Advantages:**
+- Easy to update without code changes
+- Reliable hosting and global CDN
+- Built-in viewing capabilities
+
+<Note>
+  Ensure the Google Drive file sharing permissions are set to "Anyone with the link can view" for public access.
+</Note>
+
+## Design Philosophy
+
+<CardGroup cols={2}>
+  <Card title="Simplicity" icon="minimize">
+    Clear, focused design with only essential elements—no distractions from the primary goal
+  </Card>
+  <Card title="Symmetry" icon="align-center">
+    Center-aligned layout creates visual balance and draws attention to CTAs
+  </Card>
+  <Card title="Hierarchy" icon="layer-group">
+    Visual weight decreases from title → description → buttons, guiding the user's eye
+  </Card>
+  <Card title="Prominence" icon="star">
+    Emerald primary CTA stands out from slate secondary, clearly indicating preferred action
+  </Card>
+</CardGroup>
+
+## Integration Example
+
+```jsx
+import Contact from "./components/Main/Contact"
+
+function MainContent() {
+  return (
+    <main>
+      <Hero />
+      <About />
+      <Skills />
+      <Works />
+      <ProjectsView />
+      <Contact />
+      {/* Footer */}
+    </main>
+  )
+}
+```
+
+## Customization
+
+To update contact information or resume link:
+
+```json
+{
+  "contact.title": "Your custom title",
+  "contact.description": [
+    "Your first paragraph",
+    "Your second paragraph"
+  ],
+  "contact.ctaEmail": "Your CTA text",
+  "contact.ctaResume": "Your CTA text"
+}
+```
+
+Update the email address directly in the component:
+
+```jsx
+<a href="mailto:your-email@example.com">
+```
+
+Update the resume link:
+
+```jsx
+<a href="https://your-resume-url.com">
+```
+
+## Dependencies
+
+- **react-i18next**: Translation management
+- **Tailwind CSS**: Utility styling
+- **Bootstrap Icons**: Icon library (bi-envelope-paper-heart, bi-file-earmark-arrow-down)

@@ -1,0 +1,661 @@
+---
+title: "Projects Component"
+description: "Dynamic project gallery with Firebase integration and filtering"
+icon: "folder-open"
+---
+
+## Overview
+
+The Projects component is a multi-layer system that fetches, filters, and displays project data from Firebase Firestore. It consists of three main components working together: ProjectsView (UI and filtering), ProjectListContainer (data fetching), and Project (individual card rendering).
+
+## Component Architecture
+
+<CardGroup cols={3}>
+  <Card title="ProjectsView" icon="filter">
+    **Location:** `src/components/Main/ProjectsView.jsx`
+    
+    UI container with filter controls
+  </Card>
+  <Card title="ProjectListContainer" icon="database">
+    **Location:** `src/components/Projects/ProjectListContainer.jsx`
+    
+    Firebase data fetching and state management
+  </Card>
+  <Card title="ProjectList" icon="list">
+    **Location:** `src/components/Projects/ProjectList.jsx`
+    
+    List rendering with loading and error states
+  </Card>
+  <Card title="Project" icon="window">
+    **Location:** `src/components/Projects/Project.jsx`
+    
+    Individual project card component
+  </Card>
+</CardGroup>
+
+## ProjectsView Component
+
+### Overview
+
+Manages the UI layout and project type filtering.
+
+```jsx
+function ProjectsView() {
+  const { t } = useTranslation()
+  const [type, setType] = useState("todos")
+
+  const filters = [
+    { id: "todos", label: t("projects.all") },
+    { id: "sitioWeb", label: t("projects.webSites") },
+    { id: "varios", label: t("projects.others") },
+  ]
+
+  return (
+    <section id="projects" className="scroll-mt-32 px-6">
+      {/* Content */}
+    </section>
+  )
+}
+```
+
+### Filter System
+
+```jsx
+<div className="flex flex-wrap gap-3">
+  {filters.map((filter) => {
+    const isActive = type === filter.id
+    return (
+      <button
+        key={filter.id}
+        type="button"
+        onClick={() => setType(filter.id)}
+        aria-pressed={isActive}
+        className={`inline-flex items-center rounded-full border px-4 py-2 text-sm font-medium uppercase tracking-[0.2em] transition ${
+          isActive
+            ? "border-emerald-400 bg-emerald-500/10 text-emerald-200"
+            : "border-slate-700 bg-slate-900/70 text-slate-300 hover:border-slate-500 hover:text-white"
+        }`}
+      >
+        {filter.label}
+      </button>
+    )
+  })}
+</div>
+```
+
+<Tabs>
+  <Tab title="Filter States">
+    **Active filter:**
+    - Emerald border and background
+    - Brighter text color
+    - `aria-pressed="true"`
+    
+    **Inactive filter:**
+    - Slate border and background
+    - Muted text color
+    - Hover effects
+  </Tab>
+  <Tab title="Filter Types">
+    | ID | Translation Key | Purpose |
+    |----|-----------------|----------|
+    | `todos` | `projects.all` | Show all projects |
+    | `sitioWeb` | `projects.webSites` | Web projects only |
+    | `varios` | `projects.others` | Miscellaneous projects |
+  </Tab>
+</Tabs>
+
+### Data Flow
+
+```jsx
+<ProjectListContainer type={type} />
+```
+
+Passes the selected filter type to the container component.
+
+## ProjectListContainer Component
+
+### Firebase Integration
+
+```jsx
+import { collection, getDocs, query, where } from "firebase/firestore"
+import { db } from "../db/data"
+
+function ProjectListContainer({ type }) {
+  const [projectsList, setProjectsList] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    const projectCollection = collection(db, "projects")
+    let queryFilter
+
+    if (type === "todos") {
+      queryFilter = projectCollection
+    } else {
+      queryFilter = query(projectCollection, where("type", "==", type))
+    }
+
+    setIsLoading(true)
+    setError(null)
+
+    getDocs(queryFilter)
+      .then((res) => {
+        const projectsMapped = res.docs.map((project) => ({
+          id: project.id,
+          ...project.data(),
+        }))
+        setProjectsList(projectsMapped)
+        setIsLoading(false)
+      })
+      .catch(() => {
+        setError("projects.error")
+        setIsLoading(false)
+      })
+  }, [type])
+
+  return (
+    <ProjectList
+      isLoading={isLoading}
+      error={error}
+      projects={projectsList}
+    />
+  )
+}
+```
+
+### Query Logic
+
+<Accordion title="Firestore query construction">
+  **Show all projects:**
+  ```javascript
+  // When type === "todos"
+  queryFilter = collection(db, "projects")
+  // Fetches entire collection
+  ```
+  
+  **Filter by type:**
+  ```javascript
+  // When type === "sitioWeb" or "varios"
+  queryFilter = query(
+    collection(db, "projects"),
+    where("type", "==", type)
+  )
+  // Filters documents where type field matches
+  ```
+</Accordion>
+
+### Props Interface
+
+```typescript
+ProjectListContainer.propTypes = {
+  type: PropTypes.string.isRequired,
+}
+```
+
+## ProjectList Component
+
+### State Handling
+
+Manages three states: loading, error, and success.
+
+<Tabs>
+  <Tab title="Error State">
+    ```jsx
+    if (error) {
+      return (
+        <p className="rounded-2xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-center text-sm text-red-200">
+          {t(error)}
+        </p>
+      )
+    }
+    ```
+    
+    Displays error message in red-themed alert box.
+  </Tab>
+  <Tab title="Loading State">
+    ```jsx
+    if (isLoading) {
+      return (
+        <section className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <div key={`skeleton-${index}`} className="w-full animate-pulse rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
+              {/* Skeleton structure */}
+            </div>
+          ))}
+        </section>
+      )
+    }
+    ```
+    
+    Shows 3 animated skeleton cards while fetching data.
+  </Tab>
+  <Tab title="Empty State">
+    ```jsx
+    if (projects.length === 0) {
+      return (
+        <p className="rounded-2xl border border-slate-800 bg-slate-900/60 px-4 py-4 text-center text-sm text-slate-200">
+          {t("projects.empty")}
+        </p>
+      )
+    }
+    ```
+    
+    Displays "No projects to show yet" message.
+  </Tab>
+  <Tab title="Success State">
+    ```jsx
+    return (
+      <section className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+        {projects.map((project) => {
+          if (project.visible === false) return null
+          return <Project key={project.id} project={project} />
+        })}
+      </section>
+    )
+    ```
+    
+    Renders project cards in responsive grid.
+  </Tab>
+</Tabs>
+
+### Skeleton Loader
+
+```jsx
+<div className="w-full animate-pulse rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
+  <div className="mb-4 h-44 w-full rounded-xl bg-slate-800" /> {/* Image */}
+  <div className="mb-2 h-4 w-2/3 rounded bg-slate-800" />    {/* Title */}
+  <div className="mb-2 h-3 w-1/2 rounded bg-slate-800" />    {/* Subtitle */}
+  <div className="mb-3 flex flex-wrap gap-2">
+    <span className="h-6 w-16 rounded-full bg-slate-800" /> {/* Badges */}
+    <span className="h-6 w-14 rounded-full bg-slate-800" />
+    <span className="h-6 w-20 rounded-full bg-slate-800" />
+  </div>
+  <div className="h-3 w-full rounded bg-slate-800" />       {/* Description */}
+</div>
+```
+
+<Note>
+  The `animate-pulse` Tailwind utility provides the pulsing animation effect.
+</Note>
+
+## Project Component
+
+### Project Card Structure
+
+```jsx
+function Project({ project }) {
+  const { t, i18n } = useTranslation()
+
+  const isInProgress = project?.isFinished === false
+  const description =
+    i18n.language === "es"
+      ? project?.descriptionSpanish ?? project?.description ?? ""
+      : project?.descriptionEnglish ?? project?.description ?? ""
+
+  const imageSrc = project?.imageUrl || project?.img || (project?.title ? `/${project.title}.webp` : "")
+  const technologies = Array.isArray(project?.techs) ? project.techs : []
+
+  const typeLabels = {
+    sitioWeb: t("projects.typeLabels.website"),
+    varios: t("projects.typeLabels.misc"),
+  }
+
+  const secondaryInfo = project?.role || typeLabels[project?.type] || project?.type
+
+  return (
+    <article className="project relative flex h-full flex-col gap-4 overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/60 p-5 shadow-xl shadow-slate-950/40 backdrop-blur">
+      {/* Card content */}
+    </article>
+  )
+}
+```
+
+### Description Localization
+
+Handles multilingual descriptions with fallbacks:
+
+```javascript
+const description =
+  i18n.language === "es"
+    ? project?.descriptionSpanish ?? project?.description ?? ""
+    : project?.descriptionEnglish ?? project?.description ?? ""
+```
+
+**Fallback chain:**
+1. Language-specific field (`descriptionSpanish` or `descriptionEnglish`)
+2. Generic `description` field
+3. Empty string
+
+### In-Progress Badge
+
+```jsx
+{isInProgress && (
+  <span className="absolute right-4 top-4 inline-flex items-center gap-2 rounded-full bg-red-500/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white">
+    <span className="h-2 w-2 rounded-full bg-white" />
+    {t("projects.inProgress")}
+  </span>
+)}
+```
+
+**Displays when:** `project.isFinished === false`
+
+<Accordion title="Badge styling details">
+  - **Position**: Absolute, top-right corner
+  - **Color**: Red background with white text
+  - **Indicator**: White dot for "live" feeling
+  - **Text**: "IN DEVELOPMENT" (translated)
+</Accordion>
+
+### Project Image
+
+```jsx
+<figure className="overflow-hidden rounded-xl border border-slate-800/80 bg-slate-900">
+  {imageSrc ? (
+    <img
+      src={imageSrc}
+      alt={project?.title}
+      loading="lazy"
+      className="h-48 w-full object-cover transition duration-500 hover:scale-105"
+    />
+  ) : (
+    <div className="flex h-48 w-full items-center justify-center text-slate-500">
+      {t("projects.noImage")}
+    </div>
+  )}
+</figure>
+```
+
+**Features:**
+- Lazy loading with `loading="lazy"`
+- Hover zoom effect with `hover:scale-105`
+- Fallback placeholder if no image
+- Fixed height of 12rem (h-48)
+
+### Content Section
+
+```jsx
+<div className="flex flex-col gap-2">
+  <div>
+    <h3 className="text-xl font-semibold text-white">{project?.title}</h3>
+    {secondaryInfo && <p className="text-sm text-slate-400">{secondaryInfo}</p>}
+  </div>
+
+  {technologies.length > 0 && (
+    <ul className="flex flex-wrap gap-2">
+      {technologies.map((tech) => (
+        <li
+          key={tech}
+          className="rounded-full border border-sky-500/60 bg-sky-500/10 px-3 py-1 text-xs font-medium uppercase tracking-wide text-sky-200"
+        >
+          {tech}
+        </li>
+      ))}
+    </ul>
+  )}
+
+  {description && <p className="text-sm leading-relaxed text-slate-200">{description}</p>}
+</div>
+```
+
+### Action Links
+
+```jsx
+<div className="mt-auto flex flex-wrap gap-3">
+  {project?.webLink && (
+    <a
+      href={project.webLink}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-2 rounded-full border border-emerald-500/60 px-4 py-2 text-sm font-medium text-emerald-200 transition hover:bg-emerald-500/10"
+    >
+      <i className="bi bi-laptop text-lg" aria-hidden="true" />
+      <span>{t("projects.links.demo")}</span>
+    </a>
+  )}
+  {project?.githubLink && (
+    <a
+      href={project.githubLink}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-2 rounded-full border border-slate-500/80 px-4 py-2 text-sm font-medium text-slate-200 transition hover:bg-slate-500/10"
+    >
+      <i className="bi bi-github text-lg" aria-hidden="true" />
+      <span>{t("projects.links.repository")}</span>
+    </a>
+  )}
+</div>
+```
+
+<Note>
+  The `mt-auto` class pushes links to the bottom of the card, ensuring consistent alignment across cards of different heights.
+</Note>
+
+## Project Data Structure
+
+### Firebase Document Schema
+
+```typescript
+interface Project {
+  id: string                    // Document ID
+  title: string                 // Project name
+  description?: string          // Generic description
+  descriptionEnglish?: string   // English description
+  descriptionSpanish?: string   // Spanish description
+  imageUrl?: string             // Image URL (Firebase Storage)
+  img?: string                  // Alternative image field
+  techs?: string[]              // Array of technologies
+  isFinished?: boolean          // Completion status
+  visible?: boolean             // Visibility flag
+  role?: string                 // Developer role
+  type?: string                 // "sitioWeb" | "varios"
+  webLink?: string              // Live demo URL
+  githubLink?: string           // Repository URL
+}
+```
+
+### PropTypes Definition
+
+```jsx
+Project.propTypes = {
+  project: PropTypes.shape({
+    id: PropTypes.string,
+    title: PropTypes.string,
+    description: PropTypes.string,
+    descriptionEnglish: PropTypes.string,
+    descriptionSpanish: PropTypes.string,
+    imageUrl: PropTypes.string,
+    img: PropTypes.string,
+    techs: PropTypes.arrayOf(PropTypes.string),
+    isFinished: PropTypes.bool,
+    role: PropTypes.string,
+    type: PropTypes.string,
+    webLink: PropTypes.string,
+    githubLink: PropTypes.string,
+  }).isRequired,
+}
+```
+
+## Translation Keys
+
+<Tabs>
+  <Tab title="Section Labels">
+    | Key | English | Spanish |
+    |-----|---------|----------|
+    | `projects.subtitle` | Showcase | Showcase |
+    | `projects.title` | Projects | Proyectos |
+    | `projects.description` | Selected projects that blend... | Algunos proyectos destacados... |
+  </Tab>
+  <Tab title="Filters">
+    | Key | English | Spanish |
+    |-----|---------|----------|
+    | `projects.all` | All | Todos |
+    | `projects.webSites` | Web | Web |
+    | `projects.others` | Various | Varios |
+  </Tab>
+  <Tab title="States & Labels">
+    | Key | English | Spanish |
+    |-----|---------|----------|
+    | `projects.inProgress` | In development | En desarrollo |
+    | `projects.noImage` | Image coming soon | Imagen en preparación |
+    | `projects.error` | We couldn't load the projects... | No se pudieron cargar... |
+    | `projects.empty` | No projects to show yet... | Todavía no hay proyectos... |
+    | `projects.links.demo` | View demo | Ver demo |
+    | `projects.links.repository` | Repository | Repositorio |
+    | `projects.typeLabels.website` | Website | Sitio web |
+    | `projects.typeLabels.misc` | Other | Otros |
+  </Tab>
+</Tabs>
+
+## Responsive Grid
+
+```jsx
+className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3"
+```
+
+<CardGroup cols={3}>
+  <Card title="Mobile (< 768px)" icon="mobile">
+    1 column
+    
+    Full-width cards stacked vertically
+  </Card>
+  <Card title="Tablet (≥ 768px)" icon="tablet">
+    2 columns
+    
+    Side-by-side card layout
+  </Card>
+  <Card title="Desktop (≥ 1280px)" icon="desktop">
+    3 columns
+    
+    Maximum density grid
+  </Card>
+</CardGroup>
+
+## Styling Details
+
+### Card Hover Effects
+
+```css
+.project img {
+  transition: transform 500ms;
+}
+
+.project img:hover {
+  transform: scale(1.05);
+}
+```
+
+### Technology Badge Colors
+
+```jsx
+// Sky theme for project technologies
+className="rounded-full border border-sky-500/60 bg-sky-500/10 px-3 py-1 text-xs font-medium uppercase tracking-wide text-sky-200"
+```
+
+Consistent with skills section styling.
+
+### Link Button Styles
+
+<Tabs>
+  <Tab title="Demo Link">
+    ```jsx
+    className="inline-flex items-center gap-2 rounded-full border border-emerald-500/60 px-4 py-2 text-sm font-medium text-emerald-200 transition hover:bg-emerald-500/10"
+    ```
+    
+    **Emerald theme** for primary action (view demo)
+  </Tab>
+  <Tab title="GitHub Link">
+    ```jsx
+    className="inline-flex items-center gap-2 rounded-full border border-slate-500/80 px-4 py-2 text-sm font-medium text-slate-200 transition hover:bg-slate-500/10"
+    ```
+    
+    **Slate theme** for secondary action (view code)
+  </Tab>
+</Tabs>
+
+## Accessibility
+
+- **Semantic HTML**: `<article>` for each project card
+- **Heading hierarchy**: `<h2>` for section, `<h3>` for project titles
+- **Alternative text**: Descriptive alt text using project titles
+- **Link security**: `rel="noopener noreferrer"` on external links
+- **ARIA labels**: `aria-pressed` on filter buttons
+- **Icon labels**: `aria-hidden="true"` on decorative icons
+- **Lazy loading**: Images load as needed for performance
+- **Keyboard navigation**: All interactive elements focusable
+
+## Error Handling
+
+```jsx
+.catch(() => {
+  setError("projects.error")
+  setIsLoading(false)
+})
+```
+
+Generic error handling displays user-friendly message without exposing technical details.
+
+## Performance Considerations
+
+<CardGroup cols={2}>
+  <Card title="Lazy Loading" icon="image">
+    Images use `loading="lazy"` attribute to defer offscreen image loading
+  </Card>
+  <Card title="Conditional Rendering" icon="filter">
+    `visible === false` projects are filtered out before rendering
+  </Card>
+  <Card title="Optimized Queries" icon="database">
+    Firestore queries filter by type at database level, not in-memory
+  </Card>
+  <Card title="Skeleton States" icon="spinner">
+    Skeleton loaders provide instant feedback while data loads
+  </Card>
+</CardGroup>
+
+## Integration Example
+
+```jsx
+import ProjectsView from "./components/Main/ProjectsView"
+
+function MainContent() {
+  return (
+    <main>
+      <Hero />
+      <About />
+      <Skills />
+      <Works />
+      <ProjectsView />
+      {/* Other sections */}
+    </main>
+  )
+}
+```
+
+## Firebase Setup
+
+Ensure Firebase is properly initialized:
+
+```javascript
+// src/components/db/data.js
+import { initializeApp } from "firebase/app"
+import { getFirestore } from "firebase/firestore"
+
+const firebaseConfig = {
+  // Your config
+}
+
+const app = initializeApp(firebaseConfig)
+export const db = getFirestore(app)
+```
+
+<Warning>
+  Ensure Firestore security rules allow read access to the "projects" collection for your application's users.
+</Warning>
+
+## Dependencies
+
+- **React**: useState, useEffect hooks
+- **react-i18next**: Translation and language detection
+- **Firebase**: Firestore for data storage and retrieval
+- **PropTypes**: Runtime type checking
+- **Tailwind CSS**: Utility styling
+- **Bootstrap Icons**: Icon library (bi-laptop, bi-github)

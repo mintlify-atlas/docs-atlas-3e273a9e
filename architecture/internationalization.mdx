@@ -1,0 +1,575 @@
+---
+title: Internationalization (i18n)
+description: Complete guide to implementing and extending multi-language support in Portfolio Moretto using react-i18next
+---
+
+## Overview
+
+Portfolio Moretto uses **react-i18next** to provide a fully bilingual experience in English and Spanish. Every piece of user-facing text, from navigation labels to section content, is translatable through a centralized translation system.
+
+<CardGroup cols={2}>
+  <Card title="Supported Languages" icon="flag">
+    - Spanish (es) - Default
+    - English (en)
+  </Card>
+  <Card title="Key Features" icon="star">
+    - Runtime language switching
+    - Nested translation objects
+    - Array-based content
+    - No page reload required
+  </Card>
+</CardGroup>
+
+## i18next Configuration
+
+The i18n setup happens in a dedicated configuration file that initializes before the React app renders:
+
+```javascript title="src/i18n.js"
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+
+import translationES from './components/dictionaries/es.json'
+import translationEN from './components/dictionaries/en.json'
+
+const resources = {
+  es: {
+    translation: translationES
+  },
+  en: {
+    translation: translationEN
+  }
+}
+
+i18n
+  .use(initReactI18next)
+  .init({
+    resources,
+    lng: 'es',
+    debug: true,
+    keySeparator: false,
+    interpolation: {
+      escapeValue: false,
+    }
+  })
+
+export default i18n;
+```
+
+<Accordion title="Configuration Options Explained">
+- **`resources`**: Object containing all translation namespaces and languages
+- **`lng: 'es'`**: Sets Spanish as the default language
+- **`debug: true`**: Enables console logging for missing translations (useful during development)
+- **`keySeparator: false`**: Allows dots in translation keys (e.g., `"header.home"` is one key, not nested)
+- **`interpolation.escapeValue: false`**: Disables HTML escaping (React already escapes by default)
+- **`initReactI18next`**: Plugin that connects i18next to React components
+</Accordion>
+
+<Note>
+The i18n configuration must be imported in `main.jsx` **before** the App component to ensure translations are ready when components mount.
+</Note>
+
+```jsx title="src/main.jsx"
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import './i18n';              // ← Initialize i18n first
+import App from './App.jsx'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <App />
+)
+```
+
+## Translation File Structure
+
+Translation files are stored as JSON objects with dot-notation keys:
+
+```json title="src/components/dictionaries/en.json"
+{
+  "header.home": "Home",
+  "header.about": "About",
+  "header.technology": "Skills",
+  "header.works": "Experience",
+  "header.projects": "Projects",
+  "header.contact": "Contact",
+  "header.openMenu": "Open menu",
+  "header.closeMenu": "Close menu",
+  
+  "hero.tagline": "Software Developer",
+  "hero.title": "I turn ideas into software that truly works",
+  "hero.description": "I design, build, and maintain digital products that blend simple interfaces with solid, long-lasting architecture.",
+  "hero.secondary": "I'm currently part of Asince SRL, where I focus on keeping critical systems stable while building new features that help the company grow.",
+  "hero.ctaContact": "Let's collaborate",
+  "hero.ctaProjects": "View projects",
+  
+  "hero.highlights": [
+    { "label": "Years in tech", "value": "2+" },
+    { "label": "Projects delivered", "value": "5+" },
+    { "label": "Based in", "value": "Argentina" }
+  ],
+  
+  "footer.develop": "Developed by Federico Moretto",
+  "footer.rights": "All rights reserved",
+  "changeLanguage": "ES / EN"
+}
+```
+
+```json title="src/components/dictionaries/es.json"
+{
+  "header.home": "Inicio",
+  "header.about": "Sobre mí",
+  "header.technology": "Skills",
+  "header.works": "Experiencia",
+  "header.projects": "Proyectos",
+  "header.contact": "Contacto",
+  "header.openMenu": "Abrir menú",
+  "header.closeMenu": "Cerrar menú",
+  
+  "hero.tagline": "Software Developer",
+  "hero.title": "Transformo ideas en software que realmente funciona",
+  "hero.description": "Diseño, desarrollo y mantengo productos digitales que combinan interfaces simples con una arquitectura sólida y pensada para durar.",
+  "hero.secondary": "Hoy formo parte de Asince SRL, donde me enfoco en mantener estables los sistemas críticos y en crear nuevas funcionalidades que ayuden a que la empresa siga creciendo.",
+  "hero.ctaContact": "Colaboremos",
+  "hero.ctaProjects": "Ver proyectos",
+  
+  "hero.highlights": [
+    { "label": "Años en tecnología", "value": "2+" },
+    { "label": "Proyectos entregados", "value": "5+" },
+    { "label": "Desde", "value": "Argentina" }
+  ],
+  
+  "footer.develop": "Desarrollado por Federico Moretto",
+  "footer.rights": "Todos los derechos reservados",
+  "changeLanguage": "EN / ES"
+}
+```
+
+<Note>
+Both translation files must have **identical keys** to ensure all content has translations in both languages. Missing keys will display the key name instead of translated text.
+</Note>
+
+### Translation Key Patterns
+
+The project uses a consistent naming convention:
+
+| Pattern | Example | Purpose |
+|---------|---------|----------|
+| `section.field` | `header.home` | Simple string values |
+| `section.array` | `hero.highlights` | Array of objects |
+| `section.nested.field` | `about.description` | Nested content |
+| `section.action` | `hero.ctaContact` | Button/link labels |
+
+## Using Translations in Components
+
+### Basic Translation Hook
+
+The `useTranslation` hook provides access to the translation function:
+
+```jsx title="src/components/Footer/Footer.jsx"
+import { useTranslation } from "react-i18next"
+
+function Footer() {
+  const { t } = useTranslation()
+
+  return (
+    <footer className="border-t border-slate-800 bg-slate-950/80 py-6">
+      <div className="mx-auto flex max-w-6xl flex-col items-center gap-2 px-6 text-center text-xs text-slate-400 sm:flex-row sm:justify-between sm:text-sm">
+        <p>{t("footer.develop")}</p>
+        <p>© {new Date().getFullYear()} · {t("footer.rights")}</p>
+      </div>
+    </footer>
+  )
+}
+
+export default Footer
+```
+
+<Accordion title="How It Works">
+1. `useTranslation()` returns an object with the `t` function
+2. `t("footer.develop")` looks up the key in the current language's translation file
+3. If the language is `"en"`, it returns `"Developed by Federico Moretto"`
+4. If the language is `"es"`, it returns `"Desarrollado por Federico Moretto"`
+</Accordion>
+
+### Translating Arrays
+
+For complex data structures like arrays of objects, use the `returnObjects` option:
+
+```jsx title="src/components/Main/Hero.jsx"
+import { useTranslation } from "react-i18next"
+
+function Hero() {
+  const { t } = useTranslation()
+  const highlights = t("hero.highlights", { returnObjects: true })
+
+  return (
+    <section>
+      <ul className="grid gap-4">
+        {Array.isArray(highlights) &&
+          highlights.map((item, index) => (
+            <li key={`hero-highlight-${index}`}>
+              <p className="text-3xl font-semibold">{item?.value}</p>
+              <p className="text-sm uppercase">{item?.label}</p>
+            </li>
+          ))}
+      </ul>
+    </section>
+  )
+}
+
+export default Hero
+```
+
+<Note>
+Always check `Array.isArray(highlights)` before mapping to prevent runtime errors if the translation key doesn't exist or returns unexpected data.
+</Note>
+
+### Translation with i18n Instance
+
+Access the i18n instance for language control:
+
+```jsx title="src/components/Header/Header.jsx"
+import { useState } from "react"
+import { useTranslation } from "react-i18next"
+
+function Header() {
+  const { t, i18n } = useTranslation()
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+
+  const toggleLanguage = () => {
+    const nextLanguage = i18n.language === "es" ? "en" : "es"
+    i18n.changeLanguage(nextLanguage)
+  }
+
+  const navLinks = [
+    { id: "home", label: t("header.home"), href: "#hero" },
+    { id: "about", label: t("header.about"), href: "#about" },
+    { id: "works", label: t("header.works"), href: "#works" },
+    { id: "tech", label: t("header.technology"), href: "#tech" },
+    { id: "projects", label: t("header.projects"), href: "#projects" },
+    { id: "contact", label: t("header.contact"), href: "#contact" },
+  ]
+
+  return (
+    <header>
+      <nav>
+        <ul>
+          {navLinks.map((link) => (
+            <li key={link.id}>
+              <a href={link.href}>{link.label}</a>
+            </li>
+          ))}
+        </ul>
+
+        <button onClick={toggleLanguage}>
+          {t("changeLanguage")}
+        </button>
+      </nav>
+    </header>
+  )
+}
+
+export default Header
+```
+
+<Accordion title="i18n Instance Methods">
+- **`i18n.language`**: Get the current language code (`"en"` or `"es"`)
+- **`i18n.changeLanguage(lng)`**: Switch to a different language
+- **`i18n.languages`**: Array of all available languages
+- **`i18n.exists(key)`**: Check if a translation key exists
+</Accordion>
+
+## Language Switching Mechanism
+
+### How Language Switching Works
+
+1. **User clicks** the language toggle button in the Header
+2. **`toggleLanguage` function** determines the next language
+3. **`i18n.changeLanguage()`** updates the active language
+4. **React re-renders** all components using `useTranslation()`
+5. **New translations** appear without page reload
+
+```jsx
+const toggleLanguage = () => {
+  const nextLanguage = i18n.language === "es" ? "en" : "es"
+  i18n.changeLanguage(nextLanguage)
+}
+```
+
+<CardGroup cols={2}>
+  <Card title="Current Language" icon="language">
+    Access via `i18n.language` to conditionally render based on active language
+  </Card>
+  <Card title="Change Language" icon="rotate">
+    Call `i18n.changeLanguage(code)` to switch languages programmatically
+  </Card>
+</CardGroup>
+
+### Persisting Language Preference
+
+<Note>
+The current implementation does **not** persist language preference. The language resets to Spanish (default) on page refresh. To persist the choice, you would need to store the preference in `localStorage` and read it during initialization.
+</Note>
+
+**Example implementation** (not in current codebase):
+
+```javascript title="src/i18n.js (enhanced)"
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+
+import translationES from './components/dictionaries/es.json'
+import translationEN from './components/dictionaries/en.json'
+
+const resources = {
+  es: { translation: translationES },
+  en: { translation: translationEN }
+}
+
+// Retrieve saved language or default to 'es'
+const savedLanguage = localStorage.getItem('language') || 'es'
+
+i18n
+  .use(initReactI18next)
+  .init({
+    resources,
+    lng: savedLanguage,  // Use saved preference
+    debug: true,
+    keySeparator: false,
+    interpolation: {
+      escapeValue: false,
+    }
+  })
+
+// Save language changes to localStorage
+i18n.on('languageChanged', (lng) => {
+  localStorage.setItem('language', lng)
+})
+
+export default i18n;
+```
+
+## Translation Best Practices
+
+<Accordion title="Use Descriptive Keys">
+```json
+// Good
+"hero.ctaContact": "Let's collaborate"
+"header.openMenu": "Open menu"
+
+// Avoid
+"button1": "Let's collaborate"
+"menu": "Open menu"
+```
+
+Descriptive keys make it easier to understand context and prevent key collisions.
+</Accordion>
+
+<Accordion title="Keep Keys Consistent Across Languages">
+Every key in `en.json` must exist in `es.json` with the same structure:
+
+```json
+// en.json
+"hero.highlights": [
+  { "label": "Years in tech", "value": "2+" }
+]
+
+// es.json
+"hero.highlights": [
+  { "label": "Años en tecnología", "value": "2+" }
+]
+```
+</Accordion>
+
+<Accordion title="Group Related Translations">
+Organize keys by section or component:
+
+```json
+"header.home": "Home",
+"header.about": "About",
+"header.contact": "Contact",
+
+"footer.develop": "Developed by Federico Moretto",
+"footer.rights": "All rights reserved"
+```
+
+This makes translation files easier to navigate and maintain.
+</Accordion>
+
+<Accordion title="Handle Missing Translations Gracefully">
+Always validate array data before rendering:
+
+```jsx
+const highlights = t("hero.highlights", { returnObjects: true })
+
+// Check if it's actually an array
+{Array.isArray(highlights) && highlights.map(...)}
+```
+</Accordion>
+
+<Accordion title="Use Optional Chaining for Nested Objects">
+When accessing nested properties, use optional chaining to prevent errors:
+
+```jsx
+<p>{item?.value}</p>
+<p>{item?.label}</p>
+```
+</Accordion>
+
+## Adding a New Language
+
+To add support for a new language (e.g., French):
+
+### Step 1: Create Translation File
+
+Create `src/components/dictionaries/fr.json` with all the same keys as `en.json` and `es.json`:
+
+```json title="src/components/dictionaries/fr.json"
+{
+  "header.home": "Accueil",
+  "header.about": "À propos",
+  "hero.title": "Je transforme les idées en logiciels qui fonctionnent vraiment",
+  // ... all other keys
+}
+```
+
+### Step 2: Import and Register
+
+Update `i18n.js` to include the new language:
+
+```javascript title="src/i18n.js"
+import translationES from './components/dictionaries/es.json'
+import translationEN from './components/dictionaries/en.json'
+import translationFR from './components/dictionaries/fr.json'  // ← Add import
+
+const resources = {
+  es: { translation: translationES },
+  en: { translation: translationEN },
+  fr: { translation: translationFR }  // ← Register language
+}
+```
+
+### Step 3: Update Language Switcher
+
+Modify the Header component to support three languages:
+
+```jsx title="src/components/Header/Header.jsx"
+const toggleLanguage = () => {
+  const languages = ['es', 'en', 'fr']
+  const currentIndex = languages.indexOf(i18n.language)
+  const nextIndex = (currentIndex + 1) % languages.length
+  i18n.changeLanguage(languages[nextIndex])
+}
+```
+
+## Debugging Translations
+
+### Enable Debug Mode
+
+The debug mode is already enabled in the configuration:
+
+```javascript
+i18n.init({
+  debug: true,  // ← Logs missing keys and language changes
+  // ...
+})
+```
+
+This will log warnings in the console when:
+- A translation key doesn't exist
+- The language changes
+- i18next encounters errors
+
+### Check for Missing Keys
+
+Open the browser console and look for warnings like:
+
+```
+i18next::translator: missingKey en translation hero.newKey hero.newKey
+```
+
+This indicates that the key `hero.newKey` doesn't exist in the English translation file.
+
+### Verify Key Structure
+
+Use `i18n.exists()` to programmatically check if a key exists:
+
+```javascript
+if (!i18n.exists('hero.title')) {
+  console.warn('Missing translation key: hero.title')
+}
+```
+
+## Common Translation Patterns
+
+### Simple Strings
+
+```jsx
+// Translation file
+"contact.title": "Let's build something meaningful"
+
+// Component
+<h2>{t("contact.title")}</h2>
+```
+
+### Array Rendering
+
+```jsx
+// Translation file
+"skills.groups": [
+  {
+    "title": "Front-end",
+    "items": ["HTML", "CSS", "JavaScript", "React"]
+  }
+]
+
+// Component
+const groups = t("skills.groups", { returnObjects: true })
+groups.map(group => (
+  <div key={group.title}>
+    <h3>{group.title}</h3>
+    <ul>
+      {group.items.map(item => <li key={item}>{item}</li>)}
+    </ul>
+  </div>
+))
+```
+
+### Conditional Text
+
+```jsx
+// Translation file
+"projects.inProgress": "In development",
+"projects.completed": "Completed"
+
+// Component
+<span>{project.status === 'progress' ? t('projects.inProgress') : t('projects.completed')}</span>
+```
+
+### Dynamic Values with Interpolation
+
+```jsx
+// Translation file
+"greeting": "Hello, {{name}}!"
+
+// Component
+<p>{t("greeting", { name: "Federico" })}</p>
+// Output: "Hello, Federico!"
+```
+
+<Note>
+Interpolation is supported by i18next but not currently used in Portfolio Moretto. It's useful for dynamic content like usernames or counts.
+</Note>
+
+## Next Steps
+
+<CardGroup cols={3}>
+  <Card title="Overview" href="/architecture/overview" icon="sitemap">
+    Return to architecture overview
+  </Card>
+  <Card title="Components" href="/architecture/components" icon="layer-group">
+    Explore component patterns
+  </Card>
+  <Card title="Customization" href="/customization/content" icon="pen">
+    Learn how to customize content
+  </Card>
+</CardGroup>

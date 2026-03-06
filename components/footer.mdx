@@ -1,0 +1,356 @@
+---
+title: "Footer Component"
+description: "Site footer with credits and copyright information"
+icon: "bars-staggered"
+---
+
+## Overview
+
+The Footer component provides a simple, clean site footer displaying developer credit and copyright information. It features a minimalist design with centered text and a dark color scheme consistent with the portfolio's overall aesthetic.
+
+**Location:** `src/components/Footer/Footer.jsx`
+
+## Key Features
+
+<CardGroup cols={2}>
+  <Card title="Minimal Design" icon="minimize">
+    Clean, distraction-free footer with only essential information
+  </Card>
+  <Card title="Responsive Layout" icon="mobile">
+    Stacks on mobile, horizontal on desktop for optimal space usage
+  </Card>
+  <Card title="Dynamic Copyright" icon="calendar">
+    Automatically displays current year using JavaScript Date object
+  </Card>
+  <Card title="Internationalized" icon="language">
+    Credits and copyright text adapt to selected language
+  </Card>
+</CardGroup>
+
+## Component Structure
+
+```jsx
+function Footer() {
+  const { t } = useTranslation()
+
+  return (
+    <footer className="border-t border-slate-800 bg-slate-950/80 py-6">
+      <div className="mx-auto flex max-w-6xl flex-col items-center gap-2 px-6 text-center text-xs text-slate-400 sm:flex-row sm:justify-between sm:text-sm">
+        <p>
+          {t("footer.develop")}
+        </p>
+        <p>
+          © {new Date().getFullYear()} · {t("footer.rights")}
+        </p>
+      </div>
+    </footer>
+  )
+}
+
+export default Footer
+```
+
+## Layout Structure
+
+### Footer Container
+
+```jsx
+<footer className="border-t border-slate-800 bg-slate-950/80 py-6">
+```
+
+**Styling:**
+- **Border top**: `border-t border-slate-800` creates subtle divider from main content
+- **Background**: `bg-slate-950/80` semi-transparent dark background
+- **Padding**: `py-6` (1.5rem vertical padding)
+
+### Content Container
+
+```jsx
+<div className="mx-auto flex max-w-6xl flex-col items-center gap-2 px-6 text-center text-xs text-slate-400 sm:flex-row sm:justify-between sm:text-sm">
+```
+
+**Properties:**
+- **Max width**: `max-w-6xl` (1152px) matches other sections
+- **Layout**: Flexbox with responsive direction
+- **Alignment**: Centered on mobile, space-between on desktop
+- **Typography**: `text-xs` → `text-sm` (responsive sizing)
+- **Color**: `text-slate-400` (muted gray)
+
+## Content Elements
+
+### Developer Credit
+
+```jsx
+<p>
+  {t("footer.develop")}
+</p>
+```
+
+**Output:**
+- English: "Developed by Federico Moretto"
+- Spanish: "Desarrollado por Federico Moretto"
+
+### Copyright Notice
+
+```jsx
+<p>
+  © {new Date().getFullYear()} · {t("footer.rights")}
+</p>
+```
+
+**Output:**
+- English: "© 2026 · All rights reserved"
+- Spanish: "© 2026 · Todos los derechos reservados"
+
+<Note>
+  The `new Date().getFullYear()` method automatically retrieves the current year, ensuring the copyright date is always up-to-date without manual updates.
+</Note>
+
+## Translation Keys
+
+| Key | English | Spanish |
+|-----|---------|----------|
+| `footer.develop` | Developed by Federico Moretto | Desarrollado por Federico Moretto |
+| `footer.rights` | All rights reserved | Todos los derechos reservados |
+
+## Styling Details
+
+### Color Scheme
+
+<CardGroup cols={3}>
+  <Card title="Background" icon="fill">
+    `bg-slate-950/80`
+    
+    Very dark gray with 80% opacity
+  </Card>
+  <Card title="Border" icon="minus">
+    `border-slate-800`
+    
+    Subtle top border divider
+  </Card>
+  <Card title="Text" icon="font">
+    `text-slate-400`
+    
+    Muted gray for unobtrusive text
+  </Card>
+</CardGroup>
+
+### Typography
+
+<Tabs>
+  <Tab title="Mobile (< 640px)">
+    ```css
+    font-size: 0.75rem;  /* text-xs = 12px */
+    text-align: center;
+    ```
+  </Tab>
+  <Tab title="Desktop (≥ 640px)">
+    ```css
+    font-size: 0.875rem; /* sm:text-sm = 14px */
+    text-align: left;    /* sm:text-left */
+    ```
+  </Tab>
+</Tabs>
+
+### Spacing
+
+```jsx
+py-6          // 1.5rem (24px) vertical padding
+gap-2         // 0.5rem (8px) gap between text elements
+px-6          // 1.5rem (24px) horizontal padding
+```
+
+## Responsive Behavior
+
+```
+Mobile (< 640px):
+┌─────────────────────────────────┐
+│  Developed by Federico Moretto  │
+│  © 2026 · All rights reserved   │
+└─────────────────────────────────┘
+       ↑ Centered, stacked
+
+Desktop (≥ 640px):
+┌──────────────────────────────────────────────────┐
+│ Developed by...      © 2026 · All rights reserved│
+└──────────────────────────────────────────────────┘
+  ↑ Left                              Right ↑
+```
+
+<Accordion title="Responsive class breakdown">
+  **Mobile (default):**
+  - `flex-col`: Vertical stacking
+  - `items-center`: Horizontally centered
+  - `text-center`: Center-aligned text
+  - `text-xs`: 12px font size
+  - `gap-2`: 8px spacing between items
+  
+  **Desktop (sm: breakpoint):**
+  - `sm:flex-row`: Horizontal layout
+  - `sm:justify-between`: Space between items
+  - `sm:text-sm`: 14px font size
+  - Text alignment naturally becomes left/right due to flex layout
+</Accordion>
+
+## Accessibility
+
+- **Semantic HTML**: Proper `<footer>` landmark element
+- **Readable text**: Sufficient contrast ratio for `text-slate-400` on dark background
+- **Font sizing**: Minimum 12px text size meets readability standards
+- **No interactive elements**: Pure informational content, no accessibility concerns
+
+## Design Philosophy
+
+<CardGroup cols={2}>
+  <Card title="Minimal Footprint" icon="shoe-prints">
+    Small, unobtrusive design doesn't distract from main content or compete for attention
+  </Card>
+  <Card title="Professional Polish" icon="sparkles">
+    Proper footer with credits and copyright adds professional finish to portfolio
+  </Card>
+  <Card title="Consistent Styling" icon="palette">
+    Matches overall dark theme with slate colors and semi-transparent backgrounds
+  </Card>
+  <Card title="Future-Proof" icon="clock">
+    Dynamic year calculation eliminates need for annual updates
+  </Card>
+</CardGroup>
+
+## Complete Component Example
+
+```jsx
+import { useTranslation } from "react-i18next"
+
+function Footer() {
+  const { t } = useTranslation()
+
+  return (
+    <footer className="border-t border-slate-800 bg-slate-950/80 py-6">
+      <div className="mx-auto flex max-w-6xl flex-col items-center gap-2 px-6 text-center text-xs text-slate-400 sm:flex-row sm:justify-between sm:text-sm">
+        <p>
+          {t("footer.develop")}
+        </p>
+        <p>
+          © {new Date().getFullYear()} · {t("footer.rights")}
+        </p>
+      </div>
+    </footer>
+  )
+}
+
+export default Footer
+```
+
+## Integration Example
+
+```jsx
+import Footer from "./components/Footer/Footer"
+
+function App() {
+  return (
+    <>
+      <Header />
+      <main>
+        <Hero />
+        <About />
+        <Skills />
+        <Works />
+        <ProjectsView />
+        <Contact />
+      </main>
+      <Footer />
+    </>
+  )
+}
+```
+
+<Note>
+  The Footer should be placed **outside** the `<main>` element but **inside** the root app container for proper semantic HTML structure.
+</Note>
+
+## Customization
+
+To customize footer text, update the translation files:
+
+```json
+{
+  "footer.develop": "Your custom developer credit",
+  "footer.rights": "Your custom copyright text"
+}
+```
+
+### Adding Links
+
+If you want to add links to social media or other sites:
+
+```jsx
+<footer className="border-t border-slate-800 bg-slate-950/80 py-6">
+  <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-6 text-center text-xs text-slate-400 sm:flex-row sm:justify-between sm:text-sm">
+    <p>{t("footer.develop")}</p>
+    
+    {/* Social links */}
+    <div className="flex gap-4">
+      <a href="https://github.com/username" className="hover:text-slate-200 transition">
+        <i className="bi bi-github" />
+      </a>
+      <a href="https://linkedin.com/in/username" className="hover:text-slate-200 transition">
+        <i className="bi bi-linkedin" />
+      </a>
+    </div>
+    
+    <p>© {new Date().getFullYear()} · {t("footer.rights")}</p>
+  </div>
+</footer>
+```
+
+## Comparison with Other Portfolio Footers
+
+<Tabs>
+  <Tab title="Minimal (Current)">
+    **Pros:**
+    - Clean, uncluttered
+    - Fast to render
+    - Easy to maintain
+    - Focuses on content above
+    
+    **Cons:**
+    - Limited information
+    - No social links
+    - No additional navigation
+  </Tab>
+  <Tab title="Extended (Alternative)">
+    **Could include:**
+    - Social media icons/links
+    - Quick navigation links
+    - Contact information repeat
+    - Newsletter signup
+    - Additional branding
+    
+    **Trade-offs:**
+    - More visual weight
+    - Requires more maintenance
+    - May distract from CTA above
+  </Tab>
+</Tabs>
+
+## Performance
+
+- **Lightweight**: Minimal DOM elements (1 footer, 1 div, 2 paragraphs)
+- **No external assets**: No images or external scripts
+- **No JavaScript**: Static content after initial render
+- **Fast render**: Simple structure renders instantly
+
+## Browser Support
+
+- **Date.getFullYear()**: Supported in all modern browsers and IE 5+
+- **Flexbox**: Supported in all modern browsers
+- **Tailwind classes**: Cross-browser compatible utility classes
+
+## Dependencies
+
+- **react-i18next**: Translation management
+- **Tailwind CSS**: Utility styling
+
+<Warning>
+  The footer component is extremely simple and has no complex dependencies. It's one of the most stable and maintenance-free components in the application.
+</Warning>

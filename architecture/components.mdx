@@ -1,0 +1,580 @@
+---
+title: Component Architecture
+description: Deep dive into Portfolio Moretto's component hierarchy, composition patterns, and data flow strategies
+---
+
+## Component Hierarchy
+
+Portfolio Moretto follows a clear component hierarchy that mirrors the visual structure of the application:
+
+```
+App
+├── Header
+├── MainContainer
+│   ├── Main
+│   │   ├── Hero
+│   │   ├── About
+│   │   ├── Works
+│   │   ├── Skills
+│   │   ├── ProjectsView
+│   │   │   └── ProjectListContainer
+│   │   │       └── ProjectList
+│   │   │           └── Project
+│   │   └── Contact
+│   └── Sidebar
+└── Footer
+```
+
+<Note>
+This tree structure makes it easy to understand the relationship between components and trace data flow from parent to child.
+</Note>
+
+## Layout Components
+
+### App Component
+
+The root component establishes the three-section layout:
+
+```jsx title="src/App.jsx"
+import Footer from "./components/Footer/Footer"
+import Header from "./components/Header/Header"
+import MainContainer from "./components/Main/MainContainer"
+
+function App() {
+  return (
+    <>
+      <Header />
+      <MainContainer />
+      <Footer />
+    </>
+  )
+}
+
+export default App
+```
+
+<CardGroup cols={3}>
+  <Card title="Header" icon="bars">
+    Sticky navigation bar with language switcher and menu
+  </Card>
+  <Card title="MainContainer" icon="window-maximize">
+    Main content area containing all portfolio sections
+  </Card>
+  <Card title="Footer" icon="copyright">
+    Copyright and attribution information
+  </Card>
+</CardGroup>
+
+### Header Component
+
+The Header manages navigation and language switching:
+
+```jsx title="src/components/Header/Header.jsx"
+import { useState } from "react"
+import { useTranslation } from "react-i18next"
+import logo from "../../assets/sith.png"
+
+function Header() {
+  const { t, i18n } = useTranslation()
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+
+  const handleNavClick = (event, hash) => {
+    event.preventDefault()
+    const targetElement = document.querySelector(hash)
+    
+    if (targetElement) {
+      targetElement.scrollIntoView({ behavior: "smooth", block: "start" })
+      window.history.replaceState(null, "", hash)
+    }
+    
+    setIsMenuOpen(false)
+  }
+
+  const navLinks = [
+    { id: "home", label: t("header.home"), href: "#hero" },
+    { id: "about", label: t("header.about"), href: "#about" },
+    { id: "works", label: t("header.works"), href: "#works" },
+    { id: "tech", label: t("header.technology"), href: "#tech" },
+    { id: "projects", label: t("header.projects"), href: "#projects" },
+    { id: "contact", label: t("header.contact"), href: "#contact" },
+  ]
+
+  const toggleLanguage = () => {
+    const nextLanguage = i18n.language === "es" ? "en" : "es"
+    i18n.changeLanguage(nextLanguage)
+  }
+
+  return (
+    <header className="sticky top-0 z-50 border-b border-slate-800 bg-slate-950/80 backdrop-blur">
+      {/* Navigation implementation */}
+    </header>
+  )
+}
+
+export default Header
+```
+
+<Accordion title="Key Features">
+- **Sticky positioning**: Header stays visible during scroll
+- **Responsive menu**: Hamburger menu on mobile, horizontal nav on desktop
+- **Smooth scrolling**: Custom scroll behavior for anchor links
+- **Language toggle**: Switches between English and Spanish
+- **Translatable labels**: All navigation items use i18next keys
+</Accordion>
+
+### MainContainer Component
+
+MainContainer provides the layout wrapper for main content:
+
+```jsx title="src/components/Main/MainContainer.jsx"
+import Main from "./Main"
+import Sidebar from "./Sidebar"
+
+function MainContainer() {
+  return (
+    <div className="relative flex w-full flex-col bg-gradient-to-b from-slate-950 via-slate-950 to-slate-900 sm:flex-row">
+      <div className="flex-1">
+        <Main />
+      </div>
+      <Sidebar />
+    </div>
+  )
+}
+
+export default MainContainer
+```
+
+This component creates a **flexible layout** that:
+- Stacks vertically on mobile (`flex-col`)
+- Switches to horizontal on larger screens (`sm:flex-row`)
+- Applies gradient background
+- Allocates main content area (`flex-1`) and fixed sidebar
+
+### Main Component
+
+The Main component orchestrates all portfolio sections:
+
+```jsx title="src/components/Main/Main.jsx"
+import About from "./About"
+import Contact from "./Contact"
+import Hero from "./Hero"
+import ProjectsView from "./ProjectsView"
+import Skills from "./Skills"
+import Works from "./Works"
+import 'bootstrap-icons/font/bootstrap-icons.css'
+
+function Main() {
+  return (
+    <main className="flex w-full flex-col gap-16 pb-24 pt-10 sm:pt-16">
+      <Hero />
+      <About />
+      <Works />
+      <Skills />
+      <ProjectsView />
+      <Contact />
+    </main>
+  )
+}
+
+export default Main
+```
+
+<Note>
+Section components are rendered in a specific order to create a narrative flow: introduction (Hero) → background (About) → experience (Works) → capabilities (Skills) → portfolio (Projects) → call-to-action (Contact).
+</Note>
+
+### Footer Component
+
+A simple footer with copyright and attribution:
+
+```jsx title="src/components/Footer/Footer.jsx"
+import { useTranslation } from "react-i18next"
+
+function Footer() {
+  const { t } = useTranslation()
+
+  return (
+    <footer className="border-t border-slate-800 bg-slate-950/80 py-6">
+      <div className="mx-auto flex max-w-6xl flex-col items-center gap-2 px-6 text-center text-xs text-slate-400 sm:flex-row sm:justify-between sm:text-sm">
+        <p>{t("footer.develop")}</p>
+        <p>© {new Date().getFullYear()} · {t("footer.rights")}</p>
+      </div>
+    </footer>
+  )
+}
+
+export default Footer
+```
+
+## Content Section Components
+
+### Hero Component
+
+The Hero section demonstrates advanced translation usage with array data:
+
+```jsx title="src/components/Main/Hero.jsx"
+import { useTranslation } from "react-i18next"
+
+function Hero() {
+  const { t } = useTranslation()
+  const highlights = t("hero.highlights", { returnObjects: true })
+
+  return (
+    <section id="hero" className="scroll-mt-32 px-6">
+      <div className="mx-auto grid max-w-6xl gap-10 overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/50 px-8 py-12 shadow-xl shadow-slate-950/40 backdrop-blur lg:grid-cols-[2fr,1fr]">
+        <div className="flex flex-col gap-6">
+          <span className="inline-flex items-center gap-2 self-start rounded-full border border-slate-700 bg-slate-900/70 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-sky-300">
+            <span className="h-2 w-2 rounded-full bg-emerald-400" />
+            {t("hero.tagline")}
+          </span>
+
+          <h1 className="text-4xl font-semibold text-white sm:text-5xl lg:text-6xl">
+            {t("hero.title")}
+          </h1>
+
+          <p className="max-w-2xl text-lg leading-relaxed text-slate-200">
+            {t("hero.description")}
+          </p>
+
+          <p className="max-w-2xl text-base text-slate-400">
+            {t("hero.secondary")}
+          </p>
+
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+            <a href="#contact" className="inline-flex items-center justify-center gap-2 rounded-full border border-emerald-500/70 bg-emerald-500/10 px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-emerald-200 transition hover:border-emerald-400 hover:bg-emerald-400/20">
+              <i className="bi bi-send-fill text-base" aria-hidden="true" />
+              {t("hero.ctaContact")}
+            </a>
+            <a href="#projects" className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-700 bg-slate-900/70 px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-slate-200 transition hover:border-slate-500 hover:bg-slate-800/80">
+              <i className="bi bi-grid-fill text-base" aria-hidden="true" />
+              {t("hero.ctaProjects")}
+            </a>
+          </div>
+        </div>
+
+        <ul className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+          {Array.isArray(highlights) &&
+            highlights.map((item, index) => (
+              <li key={`hero-highlight-${index}`} className="rounded-2xl border border-slate-800 bg-slate-900/70 px-6 py-5 shadow-inner shadow-slate-950/40">
+                <p className="text-3xl font-semibold text-white">{item?.value}</p>
+                <p className="text-sm uppercase tracking-[0.3em] text-slate-400">{item?.label}</p>
+              </li>
+            ))}
+        </ul>
+      </div>
+    </section>
+  )
+}
+
+export default Hero
+```
+
+<Accordion title="Component Highlights">
+- **Translation objects**: Uses `returnObjects: true` to get array data from i18next
+- **Responsive grid**: Two-column layout on large screens, single column on mobile
+- **Dynamic highlights**: Maps over translation array to render statistics
+- **Call-to-action buttons**: Primary (Contact) and secondary (Projects) actions
+- **Semantic HTML**: Uses `<section>`, `<h1>`, proper heading hierarchy
+</Accordion>
+
+## Data-Driven Components
+
+### ProjectListContainer (Container Component)
+
+Handles data fetching and state management:
+
+```jsx title="src/components/Projects/ProjectListContainer.jsx"
+import PropTypes from "prop-types"
+import { collection, getDocs, query, where } from "firebase/firestore"
+import { useEffect, useState } from "react"
+import { db } from "../db/data"
+import ProjectList from "./ProjectList"
+
+function ProjectListContainer({ type }) {
+  const [projectsList, setProjectsList] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    const projectCollection = collection(db, "projects")
+    let queryFilter
+
+    if (type === "todos") {
+      queryFilter = projectCollection
+    } else {
+      queryFilter = query(projectCollection, where("type", "==", type))
+    }
+
+    setIsLoading(true)
+    setError(null)
+
+    getDocs(queryFilter)
+      .then((res) => {
+        const projectsMapped = res.docs.map((project) => ({
+          id: project.id,
+          ...project.data(),
+        }))
+        setProjectsList(projectsMapped)
+        setIsLoading(false)
+      })
+      .catch(() => {
+        setError("projects.error")
+        setIsLoading(false)
+      })
+  }, [type])
+
+  return (
+    <ProjectList
+      isLoading={isLoading}
+      error={error}
+      projects={projectsList}
+    />
+  )
+}
+
+export default ProjectListContainer
+
+ProjectListContainer.propTypes = {
+  type: PropTypes.string.isRequired,
+}
+```
+
+<CardGroup cols={2}>
+  <Card title="Responsibilities" icon="briefcase">
+    - Firebase Firestore queries
+    - Loading state management
+    - Error handling
+    - Data transformation
+    - Re-fetching on type change
+  </Card>
+  <Card title="Props" icon="arrow-down">
+    **Receives:**
+    - `type`: Filter for project category
+    
+    **Passes down:**
+    - `isLoading`: Boolean loading state
+    - `error`: Error message key
+    - `projects`: Array of project objects
+  </Card>
+</CardGroup>
+
+### ProjectList (Presentational Component)
+
+Renders the UI based on received props:
+
+```jsx title="src/components/Projects/ProjectList.jsx" 
+// Simplified example - actual implementation may vary
+import Project from "./Project"
+import { useTranslation } from "react-i18next"
+
+function ProjectList({ isLoading, error, projects }) {
+  const { t } = useTranslation()
+
+  if (isLoading) {
+    return <div>Loading...</div>
+  }
+
+  if (error) {
+    return <div>{t(error)}</div>
+  }
+
+  if (projects.length === 0) {
+    return <div>{t("projects.empty")}</div>
+  }
+
+  return (
+    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {projects.map((project) => (
+        <Project key={project.id} {...project} />
+      ))}
+    </div>
+  )
+}
+
+export default ProjectList
+```
+
+<Note>
+Separating data fetching (container) from presentation (component) makes both easier to test, maintain, and reuse. The presentational component can be used with different data sources.
+</Note>
+
+## Component Composition Patterns
+
+### Pattern 1: Wrapper Components
+
+Components like `MainContainer` act as layout wrappers:
+
+```jsx
+function MainContainer() {
+  return (
+    <div className="layout-styles">
+      <div className="flex-1">
+        <Main />
+      </div>
+      <Sidebar />
+    </div>
+  )
+}
+```
+
+**Use case**: Apply consistent layout, spacing, and background styles to child components.
+
+### Pattern 2: Orchestrator Components
+
+Components like `Main` orchestrate multiple child components:
+
+```jsx
+function Main() {
+  return (
+    <main>
+      <Hero />
+      <About />
+      <Works />
+      <Skills />
+      <ProjectsView />
+      <Contact />
+    </main>
+  )
+}
+```
+
+**Use case**: Control the order and grouping of sections without complex logic.
+
+### Pattern 3: Container/Presenter Pattern
+
+Separate data logic from rendering:
+
+```jsx
+// Container: Handles data
+function ProjectListContainer({ type }) {
+  const [data, setData] = useState([])
+  // Fetch data, manage state...
+  return <ProjectList projects={data} />
+}
+
+// Presenter: Handles UI
+function ProjectList({ projects }) {
+  return projects.map(p => <Project {...p} />)
+}
+```
+
+**Use case**: Keep components focused on single responsibilities (data fetching OR rendering).
+
+### Pattern 4: Translation-Aware Components
+
+Components consume translations via the `useTranslation` hook:
+
+```jsx
+import { useTranslation } from "react-i18next"
+
+function Header() {
+  const { t, i18n } = useTranslation()
+  
+  return (
+    <nav>
+      <a href="#hero">{t("header.home")}</a>
+      <button onClick={() => i18n.changeLanguage('en')}>
+        {t("changeLanguage")}
+      </button>
+    </nav>
+  )
+}
+```
+
+**Use case**: Make any component responsive to language changes without prop drilling.
+
+## Props and Data Flow
+
+### Unidirectional Data Flow
+
+Data flows **down** the component tree via props:
+
+```
+ProjectListContainer
+  [state: projects, isLoading, error]
+        ↓ (props)
+   ProjectList
+        ↓ (props)
+     Project
+```
+
+<CardGroup cols={2}>
+  <Card title="Parent → Child" icon="arrow-down">
+    Parents pass data and callbacks to children via props
+  </Card>
+  <Card title="Child → Parent" icon="arrow-up">
+    Children call parent callbacks to communicate events upward
+  </Card>
+</CardGroup>
+
+### Prop Types Example
+
+```jsx title="src/components/Projects/ProjectListContainer.jsx"
+import PropTypes from "prop-types"
+
+ProjectListContainer.propTypes = {
+  type: PropTypes.string.isRequired,
+}
+```
+
+Prop validation ensures components receive the correct data types and required props.
+
+## Styling Approach
+
+All components use **Tailwind CSS utility classes** for styling:
+
+```jsx
+<header className="sticky top-0 z-50 border-b border-slate-800 bg-slate-950/80 backdrop-blur">
+  <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+    {/* Content */}
+  </div>
+</header>
+```
+
+<CardGroup cols={3}>
+  <Card title="Layout" icon="table-cells">
+    Flexbox and Grid utilities for responsive layouts
+  </Card>
+  <Card title="Spacing" icon="ruler-horizontal">
+    Consistent padding, margin, and gap scales
+  </Card>
+  <Card title="Colors" icon="palette">
+    Slate color palette with opacity variants
+  </Card>
+</CardGroup>
+
+## Best Practices
+
+<Accordion title="Keep Components Focused">
+Each component should have a single, clear responsibility. If a component does too much, split it into smaller components.
+</Accordion>
+
+<Accordion title="Use Meaningful Names">
+Component names like `ProjectListContainer`, `MainContainer`, and `Hero` clearly indicate their purpose.
+</Accordion>
+
+<Accordion title="Separate Concerns">
+Use the container/presentational pattern to separate data fetching from UI rendering.
+</Accordion>
+
+<Accordion title="Leverage Composition">
+Build complex UIs by composing simple components together rather than creating monolithic components.
+</Accordion>
+
+<Accordion title="Prop Validation">
+Use PropTypes to document expected props and catch errors during development.
+</Accordion>
+
+## Next Steps
+
+<CardGroup cols={3}>
+  <Card title="Overview" href="/architecture/overview" icon="sitemap">
+    Return to architecture overview
+  </Card>
+  <Card title="Internationalization" href="/architecture/internationalization" icon="globe">
+    Learn about multi-language support
+  </Card>
+  <Card title="Development" href="/development/setup" icon="code">
+    Start building components
+  </Card>
+</CardGroup>
